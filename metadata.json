@@ -1,0 +1,8 @@
+{
+  "name": "Green Gold",
+  "description": "An AI-powered assistant for agriculture. Chat with the AI and send pictures of your plants for analysis and advice.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

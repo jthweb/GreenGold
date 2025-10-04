@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Green Gold</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      html, body, #root {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)), url('https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?q=80&w=1974&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        transition: background-image 0.3s ease-in-out;
+      }
+      .dark body {
+        background-image: linear-gradient(to bottom, rgba(20, 22, 21, 0.96), rgba(20, 22, 21, 0.96)), url('https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?q=80&w=1974&auto=format&fit=crop');
+      }
+      @keyframes rise {
+        0% {
+          bottom: -20px;
+          opacity: 1;
+        }
+        100% {
+          bottom: 100%;
+          opacity: 0;
+        }
+      }
+      .bubble {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: rgba(59, 130, 246, 0.5);
+        border-radius: 50%;
+        animation-name: rise;
+        animation-timing-function: ease-in;
+        animation-iteration-count: infinite;
+      }
+      @keyframes fertigate-drop {
+        0% { transform: translateY(-100%); opacity: 0.7; }
+        90% { opacity: 0.7; }
+        100% { transform: translateY(250px); opacity: 0; }
+      }
+      .fertigate-droplet {
+        animation: fertigate-drop 1.5s ease-in infinite;
+      }
+      .markdown-content ul {
+        list-style-type: disc;
+        padding-inline-start: 20px;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .markdown-content li {
+        margin-bottom: 0.25rem;
+      }
+      .markdown-content strong {
+        font-weight: 600;
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.22.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "marked": "https://aistudiocdn.com/marked@^16.3.0"
+  }
+}
+</script>
+<script>
+    // Prevent FOUC by setting theme from localStorage before React loads
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+</script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
