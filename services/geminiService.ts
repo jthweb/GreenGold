@@ -85,7 +85,7 @@ const batchTranslateSchema = {
     required: ["translations"]
 };
 
-export const getGeminiResponse = async (prompt: string, language: string, image?: string): Promise<ChatMessage> => {
+export const getGeminiResponse = async (prompt: string, language: string, farmContext: string, image?: string): Promise<ChatMessage> => {
     
     const contentParts = [];
     if (image) {
@@ -98,7 +98,9 @@ export const getGeminiResponse = async (prompt: string, language: string, image?
         };
         contentParts.push(imagePart);
     }
-    contentParts.push({ text: prompt });
+    // Combine the farm context with the user's prompt
+    const fullPrompt = `${farmContext}\n\nUser's question: "${prompt}"`;
+    contentParts.push({ text: fullPrompt });
     
     try {
         // FIX: Call Gemini API using the recommended `ai.models.generateContent` method.
@@ -108,8 +110,9 @@ export const getGeminiResponse = async (prompt: string, language: string, image?
             config: {
                 responseMimeType: "application/json",
                 responseSchema: responseSchema,
-                systemInstruction: `You are GreenGold, an AI assistant for agriculture. Your goal is to provide expert advice to farmers in a way that is very easy to understand. Fertigation is the process of applying fertilizer through the irrigation system.
-- **VERY IMPORTANT: Be Concise**: Your answers MUST be short and to the point. Use bullet points.
+                systemInstruction: `You are GreenGold, an AI assistant for agriculture. Your goal is to provide expert advice to farmers in a way that is very easy to understand.
+- **VERY IMPORTANT**: You MUST use the "CURRENT FARM DATA" provided at the beginning of the user's prompt to formulate a specific, contextual, and actionable response. Do not give generic advice. Your advice must reflect the provided data points (weather, soil moisture, pH, NPK, etc.).
+- **Be Concise**: Your answers MUST be short and to the point. Use bullet points.
 - **Simplicity is Key**: Use simple, direct language. Avoid technical jargon.
 - **Actionable Advice**: Offer clear, step-by-step solutions that a farmer can immediately act on.
 - **Markdown Formatting**: Format all text responses using Markdown. Use bullet points (\`* \`) for lists and bold (\`**text**\`) for emphasis.

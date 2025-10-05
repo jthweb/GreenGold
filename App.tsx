@@ -39,6 +39,7 @@ const App: React.FC = () => {
     const [weather, setWeather] = useState<WeatherCondition>('sunny');
     const [phValue, setPhValue] = useState(6.2);
     const [npkValues, setNpkValues] = useState<NPKValues>({ n: 13, p: 7, k: 12 });
+    const [salinity, setSalinity] = useState(1.8);
 
     // Image capture state
     const [showCamera, setShowCamera] = useState(false);
@@ -81,9 +82,31 @@ const App: React.FC = () => {
             return;
         }
 
-        // If no match, call Gemini
+        // If no match, construct context and call Gemini
+        const phStatus = phValue < 6.5 ? t('acidic') : phValue > 7.0 ? t('alkaline') : t('ideal');
+        const weatherData = {
+            sunny: { text: t('sunny'), temp: '32°C', humidity: '45%', wind: '12 km/h' },
+            cloudy: { text: t('cloudy'), temp: '28°C', humidity: '60%', wind: '15 km/h' },
+            rainy: { text: t('rainy'), temp: '25°C', humidity: '85%', wind: '20 km/h' },
+        };
+        const currentWeatherData = weatherData[weather];
+
+        const farmContext = `
+---
+CURRENT FARM DATA (This is a pre-prompt with live data):
+- Location: (Assumed) Middle East / Arid Climate
+- Weather: ${currentWeatherData.text}, ${currentWeatherData.temp}, ${currentWeatherData.humidity} Humidity, ${currentWeatherData.wind} Wind
+- Soil Moisture: ${Math.round(moisture)}%
+- Soil pH: ${phValue.toFixed(1)} (${phStatus})
+- Soil Salinity (EC): ${salinity} dS/m (${t('slightlySaline')})
+- NPK Levels: Nitrogen=${npkValues.n}, Phosphorus=${npkValues.p}, Potassium=${npkValues.k}
+- Active Irrigation: ${isIrrigating ? 'Yes' : 'No'}
+---
+Based EXCLUSIVELY on the data above, please answer the user's question.
+`;
+
         try {
-            const aiResponse = await getGeminiResponse(prompt, language, image);
+            const aiResponse = await getGeminiResponse(prompt, language, farmContext, image);
             setMessages(prev => [...prev, aiResponse]);
         } catch (error) {
             console.error(error);
@@ -96,7 +119,7 @@ const App: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [language, t]);
+    }, [language, t, moisture, weather, phValue, npkValues, salinity, isIrrigating]);
 
     const handleLanguageChange = async (langCode: string) => {
         if (langCode === language) return;
@@ -197,6 +220,7 @@ const App: React.FC = () => {
                         weather={weather} setWeather={setWeather}
                         phValue={phValue} setPhValue={setPhValue}
                         npkValues={npkValues} setNpkValues={setNpkValues}
+                        salinity={salinity} setSalinity={setSalinity}
                     />
                 )}
             </div>

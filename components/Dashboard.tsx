@@ -1,4 +1,5 @@
 
+
 // FIX: This file was created to display the main dashboard grid.
 import React from 'react';
 import WidgetWrapper from './WidgetWrapper';
@@ -32,11 +33,13 @@ interface DashboardProps {
     setPhValue: React.Dispatch<React.SetStateAction<number>>;
     npkValues: NPKValues;
     setNpkValues: React.Dispatch<React.SetStateAction<NPKValues>>;
+    salinity: number;
+    setSalinity: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
     const { t } = useLocalization();
-    const { onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues } = props;
+    const { onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues, salinity, setSalinity } = props;
 
     // Effect for rain simulation
     React.useEffect(() => {
@@ -129,7 +132,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
                 </div>
                 
                 <div>
-                    <WidgetWrapper title={t('salinityEC')} explanation={t('salinityExplain')} explanationPrompt={t('salinityExplainPrompt')} onExplain={onExplain}><SalinityWidget /></WidgetWrapper>
+                    <WidgetWrapper title={t('salinityEC')} explanation={t('salinityExplain')} explanationPrompt={t('salinityExplainPrompt')} onExplain={onExplain}><SalinityWidget salinity={salinity} setSalinity={setSalinity} /></WidgetWrapper>
                 </div>
                 
                 <div className="lg:col-span-2">
