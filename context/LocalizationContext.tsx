@@ -5,6 +5,8 @@ interface LocalizationContextType {
   language: string;
   setLanguage: (language: string) => void;
   t: (key: string, replacements?: Record<string, string | number>) => string;
+  // FIX: Added isLoaded to the context type.
+  isLoaded: boolean;
 }
 
 // Create the context with a default value
@@ -14,6 +16,8 @@ export const LocalizationContext = createContext<LocalizationContextType | undef
 export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<string>('en'); // Always default to English on start
   const [translations, setTranslations] = useState<Record<string, string>>({});
+  // FIX: Added isLoaded state to track translation loading.
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const RTL_LANGUAGES = ['ar'];
 
@@ -32,6 +36,9 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (lang !== 'en') {
         await loadTranslations('en');
       }
+    } finally {
+        // FIX: Set isLoaded to true after translations are fetched.
+        setIsLoaded(true);
     }
   }, []);
 
@@ -64,6 +71,8 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     language,
     setLanguage,
     t,
+    // FIX: Expose isLoaded in the context value.
+    isLoaded,
   };
 
   return (

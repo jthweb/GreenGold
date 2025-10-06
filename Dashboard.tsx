@@ -1,4 +1,5 @@
 
+
 // FIX: This file was created to display the main dashboard grid.
 import React from 'react';
 // FIX: Adjusted import paths to point to the components directory.
@@ -33,11 +34,15 @@ interface DashboardProps {
     setPhValue: React.Dispatch<React.SetStateAction<number>>;
     npkValues: NPKValues;
     setNpkValues: React.Dispatch<React.SetStateAction<NPKValues>>;
+    // FIX: Added missing salinity props to the interface.
+    salinity: number;
+    setSalinity: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
     const { t } = useLocalization();
-    const { onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues } = props;
+    // FIX: Destructured the new salinity props.
+    const { onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues, salinity, setSalinity } = props;
 
     // Effect for rain simulation
     React.useEffect(() => {
@@ -104,10 +109,13 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
                             isDraining={isDraining}
                             setMoisture={setMoisture} 
                             setIsIrrigating={setIsIrrigating} 
+                            // FIX: Passed the required setIsDraining prop.
+                            setIsDraining={setIsDraining}
                             weather={weather} 
                         />
                    </WidgetWrapper>
-                   <WidgetWrapper title={t('salinityEC')} explanation={t('salinityExplain')} explanationPrompt={t('salinityExplainPrompt')} onExplain={onExplain}><SalinityWidget /></WidgetWrapper>
+                   {/* FIX: Passed the required salinity props to SalinityWidget. */}
+                   <WidgetWrapper title={t('salinityEC')} explanation={t('salinityExplain')} explanationPrompt={t('salinityExplainPrompt')} onExplain={onExplain}><SalinityWidget salinity={salinity} setSalinity={setSalinity} /></WidgetWrapper>
                    <WidgetWrapper title={t('soilPH')} explanation={t('phExplain')} explanationPrompt={t('phExplainPrompt')} onExplain={onExplain}><PHWidget phValue={phValue} setPhValue={setPhValue} /></WidgetWrapper>
                 </div>
 
@@ -120,7 +128,8 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
                 
                 {/* Column 4 */}
                 <div className="space-y-6">
-                    <IrrigationAdvisorWidget onExplain={onExplain} isIrrigating={isIrrigating} moisture={moisture} weather={weather} />
+                    {/* FIX: Passed the required phValue prop. */}
+                    <IrrigationAdvisorWidget onExplain={onExplain} isIrrigating={isIrrigating} moisture={moisture} weather={weather} phValue={phValue} />
                     <WidgetWrapper title={t('cropDistribution')} explanation={t('cropDistributionExplain')} explanationPrompt={t('cropDistributionExplainPrompt')} onExplain={onExplain}><CropDistributionWidget /></WidgetWrapper>
                     <WidgetWrapper title={t('marketAnalysis')} explanation={t('marketAnalysisExplain')} explanationPrompt={t('marketAnalysisExplainPrompt')} onExplain={onExplain}><MarketAnalysisWidget /></WidgetWrapper>
                 </div>

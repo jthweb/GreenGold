@@ -70,8 +70,9 @@ export const SunIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
-export const LogoIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+// FIX: Updated component to accept and pass a `style` prop to the underlying SVG element.
+export const LogoIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className, style }) => (
+    <svg className={className} style={style} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style={{stopColor: '#D4A22E', stopOpacity:1}} />
@@ -102,8 +103,9 @@ export const FertigationIcon: React.FC<{ className?: string }> = ({ className })
     </svg>
 );
 
-export const DropletIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+// FIX: Updated component to accept and pass a `style` prop to the underlying SVG element.
+export const DropletIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className, style }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className} style={style}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 21.75c-3.78 0-7.35-2.067-9.488-5.388a11.192 11.192 0 0 1 0-10.724C4.65 2.317 8.22  .25 12 .25c3.78 0 7.35 2.067 9.488 5.388a11.192 11.192 0 0 1 0 10.724C19.35 19.683 15.78 21.75 12 21.75z" />
     </svg>
 );
