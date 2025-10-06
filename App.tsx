@@ -92,7 +92,7 @@ const ModalPlaceholder: React.FC<{ title: string; onClose: () => void }> = ({ ti
 const App: React.FC = () => {
     // Context and State Hooks
     const { t, language, setLanguage, isLoaded } = useLocalization();
-    const { user, needsOnboarding, completeOnboarding } = useUser();
+    const { user, needsOnboarding, completeOnboarding, logout } = useUser();
     
     // App State Management
     const [appState, setAppState] = useState<AppState>('LANGUAGE_SELECT');
@@ -343,11 +343,7 @@ const App: React.FC = () => {
     
     const mainAppContent = (
         <div className="h-full flex flex-col lg:flex-row bg-white dark:bg-[#202a25]">
-            <Header onToggleTheme={toggleTheme} theme={theme} onLogout={() => {
-                // Proper logout logic should be in useUser hook
-                const { logout } = useUser();
-                logout();
-            }} />
+            <Header onToggleTheme={toggleTheme} theme={theme} onLogout={logout} />
             
             {/* Mobile View: Dashboard */}
             <div className={`lg:flex lg:w-1/2 xl:w-3/5 ${mobileView === 'dashboard' ? 'block' : 'hidden'}`}>
