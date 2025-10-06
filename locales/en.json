@@ -41,6 +41,8 @@
   "wheat": "Wheat",
   "maize": "Maize",
   "soybean": "Soybean",
+  "barley": "Barley",
+  "rapeseed": "Rapeseed",
   "marketAnalysis": "Market Analysis",
   "alerts": "Critical Alerts",
   "alertNitrogen": "Nitrogen levels are critically low in Sector B.",

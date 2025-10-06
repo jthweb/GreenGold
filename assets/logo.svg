@@ -1,0 +1,14 @@
+<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>
+    <defs>
+        <linearGradient id='goldGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
+            <stop offset='0%' style='stop-color:#D4A22E;stop-opacity:1'/>
+            <stop offset='100%' style='stop-color:#FBBF24;stop-opacity:1'/>
+        </linearGradient>
+        <linearGradient id='greenGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
+            <stop offset='0%' style='stop-color:#4A5C50;stop-opacity:1'/>
+            <stop offset='100%' style='stop-color:#38483E;stop-opacity:1'/>
+        </linearGradient>
+    </defs>
+    <path d='M50 2 C23.49 2 2 23.49 2 50 C2 76.51 23.49 98 50 98 S98 76.51 98 50 C98 23.49 76.51 2 50 2 Z' fill='url(%23greenGradient)'/>
+    <path d='M50 15 C69.33 15 85 30.67 85 50 C85 55.62 83.2 60.83 80.1 65.17 C75 52.8 63.6 44 50 44 S25 52.8 19.9 65.17 C16.8 60.83 15 55.62 15 50 C15 30.67 30.67 15 50 15 Z' fill='url(%23goldGradient)'/>
+</svg>

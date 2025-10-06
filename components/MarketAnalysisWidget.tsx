@@ -6,9 +6,9 @@ import { useLocalization } from '../hooks/useLocalization';
 const MarketAnalysisWidget: React.FC = () => {
     const { t } = useLocalization();
     const marketData = [
-        { crop: t('wheat'), trend: 'up', change: '+2.5%', color: 'text-green-600 dark:text-green-400' },
-        { crop: t('maize'), trend: 'down', change: '-1.2%', color: 'text-red-600 dark:text-red-400' },
-        { crop: t('soybean'), trend: 'up', change: '+0.8%', color: 'text-green-600 dark:text-green-400' },
+        { crop: t('wheat'), trend: 'up', change: '+1.8%', color: 'text-green-600 dark:text-green-400' },
+        { crop: t('barley'), trend: 'up', change: '+0.5%', color: 'text-green-600 dark:text-green-400' },
+        { crop: t('rapeseed'), trend: 'down', change: '-0.9%', color: 'text-red-600 dark:text-red-400' },
     ];
     
     return (

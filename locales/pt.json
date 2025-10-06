@@ -37,6 +37,8 @@
   "wheat": "Trigo",
   "maize": "Milho",
   "soybean": "Soja",
+  "barley": "Cevada",
+  "rapeseed": "Canola",
   "marketAnalysis": "Análise de Mercado",
   "alerts": "Alertas Críticos",
   "alertNitrogen": "Níveis de nitrogênio estão criticamente baixos no Setor B.",

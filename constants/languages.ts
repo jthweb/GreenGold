@@ -8,4 +8,9 @@ export const languages = [
   { code: 'fr', name: 'Français (French)' },
   { code: 'ar', name: 'العربية (Arabic)' },
   { code: 'zh', name: '中文 (Mandarin)' },
+  { code: 'de', name: 'Deutsch (German)' },
+  { code: 'it', name: 'Italiano (Italian)' },
+  { code: 'ru', name: 'Русский (Russian)' },
+  { code: 'ja', name: '日本語 (Japanese)' },
+  { code: 'ko', name: '한국어 (Korean)' },
 ];

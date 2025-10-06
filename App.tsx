@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChatMessage, NPKValues, Sender, TopicSuggestion, WeatherCondition, MessageContent } from './types';
 import { getGeminiResponse, translateTexts } from './services/geminiService';
@@ -18,7 +16,7 @@ import TTSButton from './components/TTSButton';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { marked } from 'marked';
 
-import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon } from './components/Icons';
+import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon } from './components/Icons';
 
 const App: React.FC = () => {
     // State variables
@@ -31,12 +29,13 @@ const App: React.FC = () => {
     const [showDashboard, setShowDashboard] = useState(true);
     const chatEndRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
     // Dashboard state
     const [moisture, setMoisture] = useState(75);
     const [isIrrigating, setIsIrrigating] = useState(false);
     const [isDraining, setIsDraining] = useState(false);
-    const [weather, setWeather] = useState<WeatherCondition>('sunny');
+    const [weather, setWeather] = useState<WeatherCondition>('cloudy');
     const [phValue, setPhValue] = useState(6.2);
     const [npkValues, setNpkValues] = useState<NPKValues>({ n: 13, p: 7, k: 12 });
     const [salinity, setSalinity] = useState(1.8);
@@ -44,6 +43,19 @@ const App: React.FC = () => {
     // Image capture state
     const [showCamera, setShowCamera] = useState(false);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    };
 
     const scrollToBottom = () => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -85,16 +97,17 @@ const App: React.FC = () => {
         // If no match, construct context and call Gemini
         const phStatus = phValue < 6.5 ? t('acidic') : phValue > 7.0 ? t('alkaline') : t('ideal');
         const weatherData = {
-            sunny: { text: t('sunny'), temp: '32°C', humidity: '45%', wind: '12 km/h' },
-            cloudy: { text: t('cloudy'), temp: '28°C', humidity: '60%', wind: '15 km/h' },
-            rainy: { text: t('rainy'), temp: '25°C', humidity: '85%', wind: '20 km/h' },
+            sunny: { text: t('sunny'), temp: '18°C', humidity: '65%', wind: '15 km/h' },
+            cloudy: { text: t('cloudy'), temp: '14°C', humidity: '75%', wind: '20 km/h' },
+            rainy: { text: t('rainy'), temp: '12°C', humidity: '88%', wind: '25 km/h' },
         };
         const currentWeatherData = weatherData[weather];
 
         const farmContext = `
 ---
 CURRENT FARM DATA (This is a pre-prompt with live data):
-- Location: (Assumed) Middle East / Arid Climate
+- Farm Profile: 50 Hectare farm in the United Kingdom.
+- Primary Crops: Wheat, Barley, Rapeseed.
 - Weather: ${currentWeatherData.text}, ${currentWeatherData.temp}, ${currentWeatherData.humidity} Humidity, ${currentWeatherData.wind} Wind
 - Soil Moisture: ${Math.round(moisture)}%
 - Soil pH: ${phValue.toFixed(1)} (${phStatus})
@@ -238,6 +251,13 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
+                        <button
+                          onClick={toggleTheme}
+                          className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-600 dark:text-slate-300"
+                          title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                        >
+                            {theme === 'light' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />}
+                        </button>
                         <LanguageSwitcher onLanguageChange={handleLanguageChange} />
                         <button 
                             onClick={() => setShowDashboard(!showDashboard)}
@@ -343,6 +363,7 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                         </div>
                     </div>
                 </div>
+                <p className="text-center text-xs text-slate-400 dark:text-slate-500 py-1 flex-shrink-0 bg-slate-50 dark:bg-[#1A221E]">Made by JThweb</p>
             </div>
 
             {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}

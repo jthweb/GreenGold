@@ -6,9 +6,9 @@ import { useLocalization } from '../hooks/useLocalization';
 const CropDistributionWidget: React.FC = () => {
     const { t } = useLocalization();
     const cropData = [
-        { label: t('wheat'), value: 45, color: '#D4A22E' },
-        { label: t('maize'), value: 30, color: '#FBBF24' },
-        { label: t('soybean'), value: 25, color: '#4A5C50' },
+        { label: t('wheat'), value: 50, color: '#D4A22E' },
+        { label: t('barley'), value: 30, color: '#FBBF24' },
+        { label: t('rapeseed'), value: 20, color: '#4A5C50' },
     ];
 
     return (

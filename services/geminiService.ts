@@ -110,6 +110,7 @@ export const getGeminiResponse = async (prompt: string, language: string, farmCo
             config: {
                 responseMimeType: "application/json",
                 responseSchema: responseSchema,
+                thinkingConfig: { thinkingBudget: 0 },
                 systemInstruction: `You are GreenGold, an AI assistant for agriculture. Your goal is to provide expert advice to farmers in a way that is very easy to understand.
 - **VERY IMPORTANT**: You MUST use the "CURRENT FARM DATA" provided at the beginning of the user's prompt to formulate a specific, contextual, and actionable response. Do not give generic advice. Your advice must reflect the provided data points (weather, soil moisture, pH, NPK, etc.).
 - **Be Concise**: Your answers MUST be short and to the point. Use bullet points.

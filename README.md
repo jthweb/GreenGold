@@ -1,99 +1,112 @@
 <p align="center">
-  <img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='goldGradient' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23D4A22E;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23FBBF24;stop-opacity:1'/%3E%3C/linearGradient%3E%3ClinearGradient id='greenGradient' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234A5C50;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%2338483E;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50 2 C23.49 2 2 23.49 2 50 C2 76.51 23.49 98 50 98 S98 76.51 98 50 C98 23.49 76.51 2 50 2 Z' fill='url(%23greenGradient)'/%3E%3Cpath d='M50 15 C69.33 15 85 30.67 85 50 C85 55.62 83.2 60.83 80.1 65.17 C75 52.8 63.6 44 50 44 S25 52.8 19.9 65.17 C16.8 60.83 15 55.62 15 50 C15 30.67 30.67 15 50 15 Z' fill='url(%23goldGradient)'/%3E%3C/svg%3E" alt="GreenGold Logo" width="150">
+  <img src="./assets/logo.svg" alt="GreenGold Logo" width="150">
+</p>
+<h1 align="center">GreenGold - Your AI Farming Assistant</h1>
+
+<p align="center">
+  <em>Winner of the "Reboot the Earth" Hackathon in Doha, hosted at Carnegie Mellon University in Qatar.</em>
 </p>
 
-# GreenGold - AI Farming Assistant for Sustainable Agriculture
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-**GreenGold is the first-prize winning project from the "Reboot the Earth" Hackathon (Doha Edition), hosted at Carnegie Mellon University in Qatar.**
-
-The hackathon was organized by the UN Office of Information and Communications Technology, the Food and Agriculture Organization (FAO), Salesforce, the Digital Public Goods Alliance, and Carnegie Mellon University.
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+  </a>
+</p>
 
 ---
 
-## Overview
+## About The Project
 
-**GreenGold is an intelligent, multilingual AI-powered assistant designed to empower farmers with actionable insights for sustainable and productive agriculture.** Our mission is to bridge the technology gap for farmers, providing them with sophisticated yet easy-to-use tools to optimize resource usage, increase crop yield, and promote sustainable farming practices like smart irrigation and integrated pest management.
+GreenGold started as a passion project during a hackathon, born from a desire to make modern technology accessible and useful for farmers everywhere. Our goal is to empower farmers with a smart, easy-to-use tool that provides real, actionable advice for sustainable and productive agriculture. We believe that by bridging the technology gap, we can help optimize resources, increase crop yields, and promote a healthier planet.
 
-By leveraging cutting-edge AI, GreenGold provides a comprehensive suite of tools, from a real-time farm dashboard to an interactive chat assistant that can analyze plant health from images and provide expert agritech advice.
-
-## AI Model & Training
-
-GreenGold's intelligence is built upon the powerful open-source **Gemma** model family.
-
-The model is continuously being trained and fine-tuned on a diverse collection of open-source agricultural datasets from platforms like Kaggle, covering topics such as crop health, soil science, pest identification, and crop management.
-
-To ensure reliability even in areas with poor connectivity, GreenGold also incorporates a robust rule-based system. This has been trained on thousands of common farming questions, enabling an edge-based service that provides instant answers for frequently asked questions without requiring internet access.
+This isn't just an app; it's a partner for your farm. It combines a real-time dashboard of your farm's vital signs with an intelligent chat assistant that's always ready to help.
 
 ## Key Features
 
--   **Interactive AI Chat**: Get instant, expert advice on your farming questions. The AI provides context-aware responses based on your specific farm data.
--   **Image Analysis**: Take a picture of your plant, and our AI will analyze its health, identify potential diseases, and suggest remedies.
--   **Comprehensive Dashboard**: A real-time overview of your farm's vital signs, including:
-    -   Soil Moisture & Smart Irrigation Control
-    -   Weather Forecasts & Analysis
-    -   Soil pH & Salinity Levels
-    -   NPK (Nitrogen, Phosphorus, Potassium) Nutrient Balance
-    -   AI-driven Recommendations and Critical Alerts
-    -   Market Analysis for key crops
--   **Multi-language Support**: Fully localized UI and AI responses in 9 languages, including Arabic, Hindi, Spanish, and more.
--   **Data Visualization**: Understand complex data easily through interactive charts and graphs.
--   **Text-to-Speech**: Listen to the AI's responses for a hands-free experience.
+-   **Interactive AI Chat**: Have a conversation with an AI that understands your farm's live data. Ask questions, get advice, and receive clear, actionable steps.
+-   **Visual Plant Health Analysis**: Snap a photo of a plant, and our AI will analyze its health, identify potential issues, and suggest solutions.
+-   **All-in-One Farm Dashboard**: See everything at a glance with our comprehensive suite of widgets.
+-   **Multi-Language Support**: The interface and AI responses are available in over a dozen languages to support farmers globally.
+-   **Clear Data Visuals**: We turn complex data into simple charts and graphs, so you always know what's happening on your farm.
+-   **Text-to-Speech**: Listen to the AI's advice, perfect for when you're busy in the field.
+-   **Light & Dark Modes**: Choose the theme that works best for your environment.
 
-## Tech Stack
+## The Dashboard at a Glance
+
+Our dashboard provides a live, interactive overview of your farm's key metrics:
+
+-   **Time & Weather**: Personalized greetings based on the time of day and live, simulated weather conditions that affect the entire dashboard.
+-   **Irrigation Advisor**: An AI-powered summary that tells you exactly what irrigation action to take (or not take) based on all available data.
+-   **Soil Moisture**: A live look at your soil's hydration levels, complete with an interactive irrigation and drainage simulation.
+-   **NPK Nutrient Levels**: Track the balance of Nitrogen (N), Phosphorus (P), and Potassium (K), and simulate fertigation to correct imbalances.
+-   **Soil Health**: Monitor Soil pH and Salinity (EC) levels to ensure optimal growing conditions.
+-   **Critical Alerts & Recommendations**: Get immediate, AI-driven alerts for urgent issues and proactive recommendations for improving your farm's health.
+-   **Farm Analytics**: Visualize your crop distribution, track market price trends for your key crops, and see your positive impact on yield and water savings.
+-   **Quick Actions**: Easily access common tasks like logging new data or initiating a soil test.
+
+## Supported Languages
+
+The app is currently available in: English, Hindi, Kannada, Spanish, Portuguese, Bengali, French, Arabic, Mandarin, German, Italian, Russian, Japanese, and Korean.
+
+## Built With
 
 -   **Frontend**: React, TypeScript, Tailwind CSS
--   **AI Model**: Open-source Gemma family models
+-   **AI**: Google Gemini API
 -   **Charting**: Custom SVG components
+
+## Future Plans
+
+We're always thinking about what's next. Here are some features on our roadmap:
+
+-   **IoT Device Integration**: The ultimate goal is to connect GreenGold to real-world IoT sensors for fully automated, live data tracking from your fields.
+-   **Historical Data & Trend Analysis**: Go beyond real-time data to view historical trends for weather, soil conditions, and crop yields.
+-   **Expanded Crop Database**: Add a wider variety of crops with specific data models for each.
 
 ## Getting Started
 
+Want to run GreenGold on your own machine? Here’s how.
+
 ### Prerequisites
 
--   A modern web browser.
--   An API Key from a cloud provider that serves the AI model.
+You'll need an API key from Google AI Studio to power the AI features.
 
 ### Local Development
 
 This project is set up to run directly in a browser-based development environment that can serve static files and manage environment variables.
 
 1.  **Set up your environment variables:**
-    Ensure your development environment has a variable named `API_KEY` set to your valid API Key. The application reads the key directly from `process.env.API_KEY`.
+    Your development environment needs a variable named `API_KEY` set to your valid Gemini API Key. The application is coded to read this key directly.
 
 2.  **Serve the files:**
-    Use a simple static file server to serve the `index.html` at the root. All module imports are handled via an import map in `index.html`.
+    Use a simple static file server (like VS Code's Live Server) to serve the `index.html` file from the root directory.
 
 ### Deployment
 
-This is a static web application. You can deploy it to any static hosting service.
+This is a static web application, so you can host it anywhere you like.
 
-1.  **Prepare your files:**
-    Ensure all your source files (`.tsx`, `.html`, `.json`, etc.) are ready. No build step is required as it uses browser-native ES modules.
-
-2.  **Deploy:**
-    Deploy the entire project folder to a static hosting provider like:
+1.  **Deploy the project folder** to a static hosting provider such as:
     -   Vercel
     -   Netlify
     -   Firebase Hosting
     -   Google Cloud Storage
 
-    **Crucially**, you must configure the `API_KEY` as an environment variable within your hosting provider's settings. The application will not function without it.
+2.  **Configure your environment variable**: This is the most important step! In your hosting provider's settings, you must add the `API_KEY` environment variable. The application will not work without it.
 
-## Contributing
+## How to Contribute
 
-Contributions are welcome! This project was born in a hackathon, and we believe in the power of the community to help it grow and make a real impact. Whether you're a developer, a designer, or an agriculture expert, we'd love your help to scale up this project.
+We welcome contributions with open arms! This project thrives on community involvement. Please read our **[Contributing Guidelines](CONTRIBUTING.md)** to get started.
 
-Please feel free to fork the repository, make changes, and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
+## Changelog
 
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+Curious about what's new? Check out our **[Changelog](CHANGELOG.md)** to see the latest updates.
+
+## Security
+
+Found a security issue? Please review our **[Security Policy](SECURITY.md)** for information on how to report it.
 
 ## The GreenGold Team
 
+This project was brought to life by a team of passionate individuals:
 -   Jonathan Oommen Easow
 -   Amitesh Vijayan Radhika
 -   Biswajit Mishra
@@ -102,4 +115,4 @@ Please feel free to fork the repository, make changes, and submit a pull request
 
 ## License
 
-Distributed under the MIT License.
+Distributed under the MIT License. See `LICENSE` for more information.
