@@ -1,66 +1,110 @@
-import React, { useState, useMemo } from 'react';
-import { WifiIcon } from './Icons';
+// FIX: This file was created to provide a smart irrigation advisor widget.
+import React from 'react';
+import WidgetWrapper from './WidgetWrapper';
+// FIX: Added the SmartIrrigationIcon to the Icons.tsx file and imported it here to resolve the missing member error.
+import { SmartIrrigationIcon, PHIcon, SunIcon, ArrowTrendingUpIcon, CloudRainIcon, QuestionMarkCircleIcon, CheckCircleIcon, ExclamationTriangleIcon, ArrowPathIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 import { WeatherCondition } from '../types';
 
 interface IrrigationAdvisorWidgetProps {
+    onExplain: (prompt: string) => void;
+    isIrrigating: boolean;
     moisture: number;
     weather: WeatherCondition;
-    onExplain: (prompt: string) => void;
+    phValue: number;
 }
 
-const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ moisture, weather, onExplain }) => {
+const AdviceContext: React.FC<{icon: React.FC<{className?: string}>, text: string, color: string}> = ({ icon: Icon, text, color }) => (
+    <div className="flex items-center gap-2">
+        <Icon className={`w-4 h-4 flex-shrink-0 ${color}`} />
+        <p className="text-xs text-slate-500 dark:text-slate-400">{text}</p>
+    </div>
+);
+
+const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExplain, isIrrigating, moisture, weather, phValue }) => {
     const { t } = useLocalization();
-    const [duration, setDuration] = useState(30); // in minutes
 
-    const advice = useMemo(() => {
+    const getAdvice = () => {
+        const phStatus = phValue < 6.5 ? t('acidic') : phValue > 7.0 ? t('alkaline') : t('ideal');
+
+        const factors = [
+            { icon: SunIcon, text: t('advisorContextWeather', { weather: t(weather) }), color: 'text-slate-500' },
+            { icon: PHIcon, text: t('advisorContextPH', { status: phStatus, value: phValue.toFixed(1) }), color: phStatus === t('ideal') ? 'text-green-500' : 'text-amber-500' },
+            { icon: ArrowTrendingUpIcon, text: t('advisorContextMarket'), color: 'text-green-500' },
+            { icon: SmartIrrigationIcon, text: t('advisorContextImpact'), color: 'text-blue-500' },
+        ];
+
+        if (isIrrigating) {
+            return {
+                title: t('irrigationInProgress'),
+                text: t('irrigationInProgressDesc'),
+                color: 'text-blue-500',
+                icon: ArrowPathIcon,
+                factors,
+                animation: 'animate-spin'
+            };
+        }
         if (weather === 'rainy') {
-            return { text: t('irrigationNotNeededRain'), level: 'ok', recommendation: t('monitorDrainage') };
+            return {
+                title: t('rainExpected'),
+                text: t('rainExpectedDesc'),
+                color: 'text-slate-500',
+                icon: CloudRainIcon,
+                factors
+            };
         }
-        if (moisture > 70) {
-            return { text: t('soilIsSaturated'), level: 'high', recommendation: t('delayIrrigation') };
+        if (moisture < 40) {
+            return {
+                title: t('immediateAction'),
+                text: t('immediateActionDesc'),
+                color: 'text-red-500',
+                icon: ExclamationTriangleIcon,
+                factors,
+                animation: 'animate-subtle-pulse'
+            };
         }
-        if (moisture < 30) {
-            return { text: t('soilIsTooDry'), level: 'low', recommendation: t('immediateAction') };
+        if (moisture < 60) {
+            return {
+                title: t('considerIrrigation'),
+                text: t('considerIrrigationDesc'),
+                color: 'text-amber-500',
+                icon: QuestionMarkCircleIcon,
+                factors
+            };
         }
-        return { text: t('irrigationOptimal'), level: 'ok', recommendation: t('scheduledRun') };
-    }, [moisture, weather, t]);
-
-    const levelColors = {
-        low: 'text-red-500',
-        ok: 'text-green-500',
-        high: 'text-blue-500',
+        return {
+            title: t('moistureOptimal'),
+            text: t('moistureOptimalDesc'),
+            color: 'text-green-500',
+            icon: CheckCircleIcon,
+            factors
+        };
     };
 
+    const advice = getAdvice();
+    const AdviceIcon = advice.icon;
+
     return (
-        <div className="flex flex-col justify-between h-full">
-            <div>
-                <p className={`text-sm font-semibold ${levelColors[advice.level as keyof typeof levelColors]}`}>{advice.text}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{advice.recommendation}</p>
-            </div>
-            <div className="mt-4">
-                <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-700 dark:text-slate-200">{t('nextRun')}:</span>
-                    <span className="font-bold text-slate-800 dark:text-white">{duration} {t('minutes')}</span>
+        <WidgetWrapper
+            title={t('irrigationAdvisor')}
+            explanation={t('irrigationAdvisorExplain')}
+            explanationPrompt={t('irrigationAdvisorExplainPrompt')}
+            onExplain={onExplain}
+        >
+            <div className="flex flex-col text-center h-full">
+                <div className="flex-1 flex flex-col items-center justify-center">
+                    <AdviceIcon className={`w-10 h-10 mb-2 ${advice.color} ${advice.animation || ''}`} />
+                    <h4 className={`text-base font-bold ${advice.color}`}>{advice.title}</h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{advice.text}</p>
                 </div>
-                <input
-                    type="range"
-                    min="15"
-                    max="120"
-                    step="15"
-                    value={duration}
-                    onChange={(e) => setDuration(Number(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 mt-2 slider-thumb"
-                />
+                 <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700/50 space-y-2">
+                    <h5 className="text-xs font-semibold text-slate-500 dark:text-slate-300 text-start mb-2">{t('advisorContextTitle')}</h5>
+                    {advice.factors.map((factor, index) => (
+                        <AdviceContext key={index} icon={factor.icon} text={factor.text} color={factor.color} />
+                    ))}
+                </div>
             </div>
-            <button
-                onClick={() => onExplain(t('startIrrigationPrompt', {duration}))}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60 transition-colors"
-            >
-                <WifiIcon className="w-5 h-5" />
-                {t('startIrrigation')}
-            </button>
-        </div>
+        </WidgetWrapper>
     );
 };
 
