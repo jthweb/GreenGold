@@ -16,7 +16,57 @@ import TTSButton from './components/TTSButton';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { marked } from 'marked';
 
-import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon, PaperClipIcon } from './components/Icons';
+import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon, PaperClipIcon, MicrophoneIcon } from './components/Icons';
+
+// FIX: Add type definitions for the browser's Speech Recognition API to resolve TypeScript errors.
+interface SpeechRecognitionEvent extends Event {
+    resultIndex: number;
+    results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+    [index: number]: SpeechRecognitionResult;
+    length: number;
+    item(index: number): SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+    [index: number]: SpeechRecognitionAlternative;
+    isFinal: boolean;
+    length: number;
+    item(index: number): SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+    transcript: string;
+    confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+    error: string;
+    message: string;
+}
+
+interface SpeechRecognition extends EventTarget {
+    continuous: boolean;
+    lang: string;
+    interimResults: boolean;
+    maxAlternatives: number;
+    onresult: (event: SpeechRecognitionEvent) => void;
+    onerror: (event: SpeechRecognitionErrorEvent) => void;
+    onstart: () => void;
+    onend: () => void;
+    start(): void;
+    stop(): void;
+}
+
+declare global {
+    interface Window {
+        SpeechRecognition: new () => SpeechRecognition;
+        webkitSpeechRecognition: new () => SpeechRecognition;
+    }
+}
+
 
 const App: React.FC = () => {
     // State variables
@@ -41,9 +91,15 @@ const App: React.FC = () => {
     const [salinity, setSalinity] = useState(1.8);
 
     // Image capture and upload state
-    const [showCamera, setShowCamera] = useState(false);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    // FIX: Define the 'showCamera' state variable that was missing.
+    const [showCamera, setShowCamera] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Speech-to-text state
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const [speechError, setSpeechError] = useState<string | null>(null);
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -79,7 +135,10 @@ const App: React.FC = () => {
         setInput('');
         setCapturedImage(null);
         setIsLoading(true);
-        setShowDashboard(false);
+        // On mobile, switch to chat view when a message is sent
+        if (window.innerWidth < 1024) {
+            setShowDashboard(false);
+        }
 
         // First, check rule-based service for a direct match
         const ruleResponse = getRuleBasedResponse(prompt, language);
@@ -134,6 +193,51 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
             setIsLoading(false);
         }
     }, [language, t, moisture, weather, phValue, npkValues, salinity, isIrrigating]);
+    
+    // Setup Speech Recognition
+    useEffect(() => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.warn("Speech recognition not supported in this browser.");
+            return;
+        }
+
+        const recognition: SpeechRecognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = language;
+
+        recognition.onstart = () => {
+            setIsListening(true);
+            setSpeechError(null);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+            console.error('Speech recognition error', event.error);
+            setSpeechError(t('speechError'));
+            setIsListening(false);
+        };
+
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+            const transcript = event.results[0][0].transcript;
+            handleSendMessage(transcript);
+        };
+        
+        recognitionRef.current = recognition;
+    }, [language, handleSendMessage, t]);
+
+    const handleToggleListening = () => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+        } else {
+            recognitionRef.current?.start();
+        }
+    };
+
 
     const handleLanguageChange = async (langCode: string) => {
         if (langCode === language) return;
@@ -237,9 +341,9 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
 
     return (
         <div className="flex h-screen bg-white dark:bg-[#1A221E] text-slate-800 dark:text-slate-200 font-sans overflow-hidden">
-            {/* Dashboard Panel */}
-            <div className={`transition-all duration-500 ease-in-out h-full flex flex-col ${showDashboard ? 'w-full lg:w-3/5 xl:w-2/3' : 'w-0'}`}>
-                {showDashboard && (
+            {/* Dashboard Panel - visible on lg screens, toggled on mobile */}
+            <div className={`transition-all duration-500 ease-in-out h-full flex flex-col flex-shrink-0 ${showDashboard ? 'w-full lg:w-3/5 xl:w-2/3' : 'w-0'}`}>
+                <div className={`${showDashboard ? 'block' : 'hidden'} lg:block h-full`}>
                     <Dashboard 
                         onExplain={handleDashboardExplain}
                         moisture={moisture} setMoisture={setMoisture}
@@ -250,11 +354,11 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                         npkValues={npkValues} setNpkValues={setNpkValues}
                         salinity={salinity} setSalinity={setSalinity}
                     />
-                )}
+                </div>
             </div>
             
-            {/* Chat Panel */}
-            <div className={`flex flex-col h-full bg-slate-50 dark:bg-[#1A221E] shadow-2xl transition-all duration-500 ease-in-out ${showDashboard ? 'w-full lg:w-2/5 xl:w-1/3' : 'w-full'}`}>
+            {/* Chat Panel - always visible on lg, toggled on mobile */}
+            <div className={`flex flex-col h-full bg-slate-50 dark:bg-[#1A221E] shadow-2xl transition-all duration-500 ease-in-out flex-grow ${showDashboard ? 'hidden lg:flex' : 'flex'}`}>
                 <header className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700/50 flex-shrink-0">
                     <div className="flex items-center gap-3">
                         <LogoIcon className="w-10 h-10" />
@@ -338,6 +442,7 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                 </div>
 
                 <div className="p-4 border-t border-slate-200 dark:border-slate-700/50 flex-shrink-0">
+                     {speechError && <p className="text-xs text-red-500 text-center mb-2">{speechError}</p>}
                     <div className="relative">
                         {capturedImage && (
                             <div className="absolute bottom-full left-0 mb-2 p-1 bg-white dark:bg-[#202a25] rounded-lg shadow-md">
@@ -357,10 +462,17 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                                 }
                             }}
                             placeholder={t('inputPlaceholder')}
-                            className="w-full p-3 pr-32 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#202a25] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none resize-none"
+                            className="w-full p-3 pr-40 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#202a25] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none resize-none"
                             rows={1}
                         />
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                             <button
+                                onClick={handleToggleListening}
+                                className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+                                title={t('speak')}
+                             >
+                                {isListening ? <Spinner className="w-6 h-6 text-red-500" /> : <MicrophoneIcon className="w-6 h-6" />}
+                            </button>
                              <button
                                 onClick={() => fileInputRef.current?.click()}
                                 className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"

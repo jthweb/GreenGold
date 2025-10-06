@@ -56,6 +56,9 @@
   "quickActions": "إجراءات سريعة",
   "newLog": "سجل جديد",
   "soilTest": "فحص التربة",
+  "newLogPrompt": "كيف أقوم بإنشاء سجل مزرعة جديد؟",
+  "soilTestPrompt": "ما هي أفضل طريقة لإجراء اختبار للتربة؟",
+  "weatherPrompt": "أرني توقعات الطقس المفصلة للأيام الثلاثة القادمة.",
   "yourImpact": "تأثيرك",
   "yieldIncrease": "زيادة المحصول",
   "waterSaved": "المياه الموفرة",
@@ -118,6 +121,8 @@
   "k": "K",
   "speakMessage": "نطق الرسالة",
   "stopSpeaking": "إيقاف النطق",
+  "speak": "تحدث",
+  "speechError": "فشل التعرف على الكلام. يرجى المحاولة مرة أخرى.",
   "language": "اللغة",
   "translatingConversation": "جارٍ ترجمة المحادثة..."
 }

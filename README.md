@@ -5,6 +5,8 @@
 
 <p align="center">
   <em>Winner of the "Reboot the Earth" Hackathon in Doha, hosted at Carnegie Mellon University in Qatar.</em>
+  <br>
+  <strong>See you at Hackathon 2025 (Oct 2-4, 2025)!</strong>
 </p>
 
 <p align="center">
@@ -24,6 +26,7 @@ This isn't just an app; it's a partner for your farm. It combines a real-time da
 ## Key Features
 
 -   **Interactive AI Chat**: Have a conversation with an AI that understands your farm's live data. Ask questions, get advice, and receive clear, actionable steps.
+-   **Voice-to-Text Input**: Speak your questions directly to the AI in your selected language.
 -   **Visual Plant Health Analysis**: Snap a photo of a plant or upload an image file, and our AI will analyze its health, identify potential issues, and suggest solutions.
 -   **All-in-One Farm Dashboard**: See everything at a glance with our comprehensive suite of widgets.
 -   **Multi-Language Support**: The interface and AI responses are available in over a dozen languages to support farmers globally.

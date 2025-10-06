@@ -56,6 +56,9 @@
   "quickActions": "Quick Actions",
   "newLog": "New Log",
   "soilTest": "Soil Test",
+  "newLogPrompt": "How do I create a new farm log?",
+  "soilTestPrompt": "What's the best way to conduct a soil test?",
+  "weatherPrompt": "Show me a detailed weather forecast for the next 3 days.",
   "yourImpact": "Your Impact",
   "yieldIncrease": "Yield Increase",
   "waterSaved": "Water Saved",
@@ -118,6 +121,8 @@
   "k": "K",
   "speakMessage": "Speak message",
   "stopSpeaking": "Stop speaking",
+  "speak": "Speak",
+  "speechError": "Speech recognition failed. Please try again.",
   "language": "Language",
   "translatingConversation": "Translating conversation..."
 }

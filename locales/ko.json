@@ -56,6 +56,9 @@
   "quickActions": "빠른 작업",
   "newLog": "새 로그",
   "soilTest": "토양 검사",
+  "newLogPrompt": "새 농장 로그를 어떻게 만드나요?",
+  "soilTestPrompt": "토양 검사를 수행하는 가장 좋은 방법은 무엇인가요?",
+  "weatherPrompt": "다음 3일간의 상세한 일기 예보를 보여주세요.",
   "yourImpact": "당신의 영향",
   "yieldIncrease": "수확량 증가",
   "waterSaved": "절약된 물",
@@ -118,6 +121,8 @@
   "k": "K",
   "speakMessage": "메시지 읽기",
   "stopSpeaking": "읽기 중지",
+  "speak": "말하기",
+  "speechError": "음성 인식이 실패했습니다. 다시 시도해주세요.",
   "language": "언어",
   "translatingConversation": "대화 번역 중..."
 }

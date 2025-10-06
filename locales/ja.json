@@ -56,6 +56,9 @@
   "quickActions": "クイックアクション",
   "newLog": "新規ログ",
   "soilTest": "土壌検査",
+  "newLogPrompt": "新しい農場ログを作成するにはどうすればよいですか？",
+  "soilTestPrompt": "土壌検査を実施する最善の方法は何ですか？",
+  "weatherPrompt": "今後3日間の詳細な天気予報を表示してください。",
   "yourImpact": "あなたの影響",
   "yieldIncrease": "収量増加",
   "waterSaved": "節水",
@@ -118,6 +121,8 @@
   "k": "K",
   "speakMessage": "メッセージを読み上げる",
   "stopSpeaking": "読み上げを停止",
+  "speak": "話す",
+  "speechError": "音声認識に失敗しました。もう一度お試しください。",
   "language": "言語",
   "translatingConversation": "会話を翻訳中..."
 }

@@ -1,5 +1,6 @@
 
 
+
 // FIX: This file was created to display the main dashboard grid.
 import React from 'react';
 import WidgetWrapper from './WidgetWrapper';
@@ -149,7 +150,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
 
                 <div className="lg:col-span-2">
                     <WidgetWrapper title={t('quickActions')} explanation={t('actionsExplain')} explanationPrompt={t('actionsExplainPrompt')} onExplain={onExplain}>
-                        <ActionsWidget />
+                        <ActionsWidget onExplain={onExplain} />
                     </WidgetWrapper>
                 </div>
             </div>

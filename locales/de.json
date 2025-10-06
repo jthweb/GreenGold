@@ -56,6 +56,9 @@
   "quickActions": "Schnellaktionen",
   "newLog": "Neuer Eintrag",
   "soilTest": "Bodentest",
+  "newLogPrompt": "Wie erstelle ich ein neues Farmprotokoll?",
+  "soilTestPrompt": "Was ist der beste Weg, einen Bodentest durchzuführen?",
+  "weatherPrompt": "Zeigen Sie mir eine detaillierte Wettervorhersage für die nächsten 3 Tage.",
   "yourImpact": "Ihr Einfluss",
   "yieldIncrease": "Ertragssteigerung",
   "waterSaved": "Wasser gespart",
@@ -118,6 +121,8 @@
   "k": "K",
   "speakMessage": "Nachricht sprechen",
   "stopSpeaking": "Sprechen beenden",
+  "speak": "Sprechen",
+  "speechError": "Spracherkennung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "language": "Sprache",
   "translatingConversation": "Übersetze Gespräch..."
 }

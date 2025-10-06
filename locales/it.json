@@ -56,6 +56,9 @@
   "quickActions": "Azioni Rapide",
   "newLog": "Nuovo Log",
   "soilTest": "Test del Suolo",
+  "newLogPrompt": "Come creo un nuovo registro della fattoria?",
+  "soilTestPrompt": "Qual è il modo migliore per condurre un test del suolo?",
+  "weatherPrompt": "Mostrami una previsione meteorologica dettagliata per i prossimi 3 giorni.",
   "yourImpact": "Il Tuo Impatto",
   "yieldIncrease": "Aumento della Resa",
   "waterSaved": "Acqua Risparmiata",
@@ -118,6 +121,8 @@
   "k": "K",
   "speakMessage": "Leggi messaggio",
   "stopSpeaking": "Smetti di leggere",
+  "speak": "Parla",
+  "speechError": "Riconoscimento vocale fallito. Riprova.",
   "language": "Lingua",
   "translatingConversation": "Traduzione della conversazione..."
 }
