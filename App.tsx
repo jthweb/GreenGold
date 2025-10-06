@@ -68,15 +68,14 @@ declare global {
 
 type AppView = 'main' | 'logs' | 'settings';
 type MobileView = 'dashboard' | 'chat';
-type AppState = 'LANGUAGE_SELECT' | 'AUTH' | 'ONBOARDING' | 'MAIN_APP';
 
 const App: React.FC = () => {
     // Context and State Hooks
-    const { t, language, setLanguage, isLoaded } = useLocalization();
+    const { t, language, setLanguage } = useLocalization();
     const { user, needsOnboarding, completeOnboarding, logout } = useUser();
     
     // App State Management
-    const [appState, setAppState] = useState<AppState>('LANGUAGE_SELECT');
+    const [languageIsSelected, setLanguageIsSelected] = useState(false);
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
     const [isTranslating, setIsTranslating] = useState(false);
     
@@ -102,19 +101,6 @@ const App: React.FC = () => {
     // Speech Recognition State
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
-
-    // Determine app state
-    useEffect(() => {
-        if (!isLoaded) {
-            setAppState('LANGUAGE_SELECT');
-        } else if (!user) {
-            setAppState('AUTH');
-        } else if (needsOnboarding) {
-            setAppState('ONBOARDING');
-        } else {
-            setAppState('MAIN_APP');
-        }
-    }, [isLoaded, user, needsOnboarding]);
 
     // Theme effect
     useEffect(() => {
@@ -217,6 +203,11 @@ const App: React.FC = () => {
         translateConversation(langCode);
     };
 
+    const handleInitialLanguageSelect = (langCode: string) => {
+        setLanguage(langCode);
+        setLanguageIsSelected(true);
+    };
+
     const handleSendMessage = useCallback(async (prompt?: string, attachedImage?: string) => {
         const messageText = prompt || input;
         if (!messageText.trim() && !attachedImage) return;
@@ -306,7 +297,19 @@ const App: React.FC = () => {
         </div>
     );
 
-    const renderCurrentView = () => {
+    const renderApp = () => {
+        if (!languageIsSelected) {
+            return <LanguageSelector onLanguageSelect={handleInitialLanguageSelect} />;
+        }
+
+        if (!user) {
+            return <LoginScreen />;
+        }
+
+        if (needsOnboarding) {
+            return <OnboardingScreen user={user} onComplete={completeOnboarding} />;
+        }
+
         switch (currentView) {
             case 'logs':
                 return <LogsPanel onBack={() => setCurrentView('main')} farmState={{ moisture, weather, phValue, npkValues, salinity }} />;
@@ -314,24 +317,13 @@ const App: React.FC = () => {
                 return <SettingsPanel onBack={() => setCurrentView('main')} />;
             case 'main':
             default:
-                 switch (appState) {
-                    case 'LANGUAGE_SELECT':
-                        return <LanguageSelector onLanguageSelect={() => setAppState('AUTH')} />;
-                    case 'AUTH':
-                        return <LoginScreen />;
-                    case 'ONBOARDING':
-                        return user ? <OnboardingScreen user={user} onComplete={completeOnboarding} /> : <LoginScreen />;
-                    case 'MAIN_APP':
-                        return mainAppContent;
-                    default:
-                        return <LanguageSelector onLanguageSelect={() => setAppState('AUTH')} />;
-                }
+                return mainAppContent;
         }
-    }
+    };
     
     return (
         <>
-            {renderCurrentView()}
+            {renderApp()}
             {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}
             {isTranslating && (
                  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
