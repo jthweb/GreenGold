@@ -1,176 +1,75 @@
-// FIX: This file was created to provide Gemini API integration for the application.
-import { GoogleGenAI, Type } from '@google/genai';
-import { ChatMessage, MessageContent, Sender, TopicSuggestion, VisualizationData } from '../types';
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { ChatMessage, MessageContent, Sender, Suggestion, VisualizationData } from '../types';
 
-// FIX: Initialize GoogleGenAI client according to coding guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.REACT_APP_API_KEY! });
+const model = 'gemini-2.5-flash';
 
-const responseSchema = {
-    type: Type.OBJECT,
-    properties: {
-        response: {
-            type: Type.ARRAY,
-            description: "The main response content, which can be text or a data visualization.",
-            items: {
-                type: Type.OBJECT,
-                properties: {
-                    type: {
-                        type: Type.STRING,
-                        enum: ["text", "visualization"],
-                        description: "The type of content part."
-                    },
-                    value: {
-                        type: Type.STRING,
-                        description: "The text content, if type is 'text'. Should be formatted in Markdown."
-                    },
-                    data: {
-                        type: Type.OBJECT,
-                        description: "The visualization data, if type is 'visualization'.",
-                        properties: {
-                            type: {
-                                type: Type.STRING,
-                                enum: ["bar", "pie"],
-                                description: "The type of chart."
-                            },
-                            title: {
-                                type: Type.STRING,
-                                description: "The title of the chart."
-                            },
-                            data: {
-                                type: Type.ARRAY,
-                                description: "The data points for the chart.",
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        label: { type: Type.STRING },
-                                        value: { type: Type.NUMBER }
-                                    },
-                                    required: ["label", "value"]
-                                }
-                            }
-                        },
-                         required: ["type", "title", "data"]
-                    }
-                },
-                required: ["type"]
-            }
-        },
-        suggestions: {
-            type: Type.ARRAY,
-            description: "A list of follow-up topic suggestions.",
-            items: {
-                type: Type.OBJECT,
-                properties: {
-                    title: { type: Type.STRING },
-                    prompt: { type: Type.STRING }
-                },
-                required: ["title", "prompt"]
-            }
-        }
-    },
-    required: ["response"]
-};
-
-const batchTranslateSchema = {
-    type: Type.OBJECT,
-    properties: {
-        translations: {
-            type: Type.ARRAY,
-            description: "An array of translated text strings, in the same order as the input.",
-            items: {
-                type: Type.STRING,
-            }
-        }
-    },
-    required: ["translations"]
-};
-
-export const getGeminiResponse = async (prompt: string, language: string, farmContext: string, image?: string): Promise<ChatMessage> => {
-    
-    const contentParts = [];
-    if (image) {
-        // FIX: Ensure image data is correctly formatted (base64 without data URI prefix).
-        const imagePart = {
-            inlineData: {
-                mimeType: 'image/jpeg',
-                data: image.split(',')[1],
-            },
-        };
-        contentParts.push(imagePart);
-    }
-    // Combine the farm context with the user's prompt
-    const fullPrompt = `${farmContext}\n\nUser's question: "${prompt}"`;
-    contentParts.push({ text: fullPrompt });
-    
+export const generateResponse = async (prompt: string, history: ChatMessage[], image?: string): Promise<ChatMessage> => {
     try {
-        // FIX: Call Gemini API using the recommended `ai.models.generateContent` method.
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: { parts: contentParts },
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: responseSchema,
-                // FIX: Corrected thinkingConfig parameter usage as per coding guidelines for low latency tasks.
-                thinkingConfig: { thinkingBudget: 0 },
-                systemInstruction: `You are GreenGold, an AI assistant for agriculture. Your goal is to provide expert advice to farmers in a way that is very easy to understand.
-- **VERY IMPORTANT**: You MUST use the "CURRENT FARM DATA" provided at the beginning of the user's prompt to formulate a specific, contextual, and actionable response. Do not give generic advice. Your advice must reflect the provided data points (weather, soil moisture, pH, NPK, etc.).
-- **Greeting**: If it is the first message of a conversation, start by greeting the user by their name (e.g., "Hello, [User's Name]!").
-- **Be Concise**: Your answers MUST be short and to the point. Use bullet points.
-- **Simplicity is Key**: Use simple, direct language. Avoid technical jargon.
-- **Actionable Advice**: Offer clear, step-by-step solutions that a farmer can immediately act on.
-- **Markdown Formatting**: Format all text responses using Markdown. Use bullet points (\`* \`) for lists and bold (\`**text**\`) for emphasis.
-- **Data Visualization**: When data is requested (like 'show my crop distribution'), generate a 'bar' or 'pie' chart visualization.
-- **Follow-up Suggestions**: Provide 2-3 relevant follow-up questions to guide the user.
-- **Language**: Your entire response, including all text, MUST be in the user's specified language: ${language}.
-- **Format**: The response must be a valid JSON object matching the provided schema. Do not wrap it in markdown backticks.`
-            }
-        });
-        
-        // FIX: Extract text and parse JSON response.
-        const jsonText = response.text;
-        let parsedResponse;
-        try {
-            parsedResponse = JSON.parse(jsonText);
-        } catch (e) {
-            console.error("Failed to parse JSON response:", jsonText);
-            // Handle cases where response is not valid JSON, maybe it's just a string.
-            return {
-                id: Date.now().toString(),
-                sender: Sender.AI,
-                content: [{ type: 'text', value: jsonText, originalValue: jsonText }]
-            };
-        }
+        const systemInstruction = `You are GreenGold, an expert AI agronomist assistant for farmers in the Middle East.
+        - Provide concise, actionable advice.
+        - Use simple language.
+        - If the user asks for a visualization (chart, graph), respond with a JSON object in this format: \`\`\`json\n{"visualization": {"type": "bar|pie", "title": "Chart Title", "data": [{"label": "string", "value": number}]}}\n\`\`\`
+        - If you provide a text response, also provide up to 3 follow-up suggestions in this format: \`\`\`json\n{"suggestions": [{"title": "Suggestion Title", "prompt": "Follow-up Prompt"}]}\n\`\`\`
+        - Combine text, visualizations, and suggestions in a single JSON response if needed. For example: \`\`\`json\n{"text": "...", "visualization": {...}, "suggestions": [...]}\n\`\`\`
+        - Always respond in the language of the user's prompt.`;
 
-
-        const content: MessageContent[] = [];
-
-        if (parsedResponse.response && Array.isArray(parsedResponse.response)) {
-             parsedResponse.response.forEach((item: any) => {
-                if (item.type === 'text' && item.value) {
-                    content.push({ type: 'text', value: item.value, originalValue: item.value });
-                } else if (item.type === 'visualization' && item.data) {
-                    content.push({ type: 'visualization', data: item.data as VisualizationData });
+        let contentParts: any[] = [{ text: prompt }];
+        if (image) {
+            const base64Data = image.split(',')[1];
+            contentParts.unshift({
+                inlineData: {
+                    mimeType: image.split(';')[0].split(':')[1] || 'image/jpeg',
+                    data: base64Data,
                 }
             });
         }
         
-        const suggestions: TopicSuggestion[] | undefined = parsedResponse.suggestions?.map((s: any) => ({
-            title: s.title,
-            originalTitle: s.title,
-            prompt: s.prompt,
-            originalPrompt: s.prompt,
-        }));
+        const response: GenerateContentResponse = await ai.models.generateContent({
+            model: model,
+            contents: { parts: contentParts }, // Assuming history is handled outside for now
+            config: {
+                systemInstruction: systemInstruction,
+            },
+        });
 
-        if (content.length === 0) {
-            // Fallback for unexpected response format
-             content.push({ type: 'text', value: "I couldn't process that request. Please try again.", originalValue: "I couldn't process that request. Please try again." });
+        const text = response.text;
+
+        let responseText = text;
+        let visualization: VisualizationData | undefined = undefined;
+        let suggestions: Suggestion[] | undefined = undefined;
+
+        // Attempt to parse JSON from the response
+        try {
+            const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
+            if (jsonMatch && jsonMatch[1]) {
+                const parsedJson = JSON.parse(jsonMatch[1]);
+                responseText = parsedJson.text || text.replace(jsonMatch[0], '').trim();
+                visualization = parsedJson.visualization;
+                suggestions = parsedJson.suggestions;
+            }
+        } catch (e) {
+            console.error("Could not parse JSON from Gemini response:", e);
+            responseText = text; // Fallback to full text
+        }
+        
+        const content: MessageContent[] = [];
+        if (responseText) {
+            content.push({ type: 'text', value: responseText });
+        }
+        if (visualization) {
+            content.push({ type: 'visualization', data: visualization });
+        }
+
+        if (content.length === 0 && !suggestions) {
+             content.push({ type: 'text', value: "I'm sorry, I couldn't generate a response. Please try again." });
         }
 
         return {
             id: Date.now().toString(),
             sender: Sender.AI,
-            content,
-            suggestions
+            content: content,
+            suggestions: suggestions,
         };
 
     } catch (error) {
@@ -178,37 +77,7 @@ export const getGeminiResponse = async (prompt: string, language: string, farmCo
         return {
             id: Date.now().toString(),
             sender: Sender.AI,
-            content: [{ type: 'text', value: 'Sorry, I encountered an error. Please try again later.', originalValue: 'Sorry, I encountered an error. Please try again later.' }]
+            content: [{ type: 'text', value: "Sorry, I'm having trouble connecting. Please check your connection and API key." }],
         };
-    }
-};
-
-export const translateTexts = async (texts: string[], targetLanguage: string): Promise<string[]> => {
-    if (!texts || texts.length === 0) {
-        return [];
-    }
-
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: { parts: [{ text: `Translate each of the following strings into ${targetLanguage}. Maintain the original order and return ONLY the JSON object. Do not add any extra text or markdown formatting. Texts:\n${JSON.stringify(texts)}` }] },
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: batchTranslateSchema
-            }
-        });
-
-        const jsonText = response.text;
-        const parsedResponse = JSON.parse(jsonText);
-
-        if (parsedResponse.translations && Array.isArray(parsedResponse.translations) && parsedResponse.translations.length === texts.length) {
-            return parsedResponse.translations;
-        } else {
-            console.error("Translation response format is incorrect or length mismatch.");
-            return texts; // Return original texts on format error
-        }
-    } catch (error) {
-        console.error("Error translating texts:", error);
-        return texts; // Return original texts on API error
     }
 };

@@ -1,4 +1,3 @@
-// FIX: This file was created to provide type definitions for the application.
 export enum Sender {
     USER = 'user',
     AI = 'ai',
@@ -10,31 +9,27 @@ export interface VisualizationData {
     data: { label: string; value: number }[];
 }
 
-export type MessageContentType = 'text' | 'visualization';
+export type MessageContent = 
+    | { type: 'text'; value: string }
+    | { type: 'visualization'; data: VisualizationData };
 
-export interface MessageContent {
-    type: MessageContentType;
-    value?: string;
-    originalValue?: string;
-    data?: VisualizationData;
-}
-
-export interface TopicSuggestion {
+export interface Suggestion {
     title: string;
-    originalTitle: string;
     prompt: string;
-    originalPrompt: string;
 }
 
 export interface ChatMessage {
     id: string;
     sender: Sender;
     content: MessageContent[];
-    suggestions?: TopicSuggestion[];
-    image?: string;
+    image?: string; // base64 image string for user messages
+    suggestions?: Suggestion[];
 }
 
-export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy';
+export interface User {
+    name: string;
+    email: string;
+}
 
 export interface NPKValues {
     n: number;
@@ -42,18 +37,4 @@ export interface NPKValues {
     k: number;
 }
 
-export interface FarmDetails {
-    farmName: string;
-    farmSize: number;
-    primaryCrops: string;
-}
-
-// FIX: Added 'name' to the User interface and created a separate OnboardingDetails type.
-export interface OnboardingDetails extends FarmDetails {
-    name: string;
-}
-
-export interface User extends OnboardingDetails {
-    email: string;
-    password?: string; // Optional for security reasons when handling user objects
-}
+export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy';

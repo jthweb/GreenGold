@@ -1,93 +1,79 @@
-import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { User, OnboardingDetails } from '../types';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { User } from '../types';
 
 interface UserContextType {
-    user: User | null;
-    needsOnboarding: boolean;
-    login: (email: string, pass: string) => boolean;
-    logout: () => void;
-    signUp: (email: string, pass: string) => boolean;
-    completeOnboarding: (details: OnboardingDetails) => void;
+  user: User | null;
+  login: (email: string, password: string) => boolean;
+  signUp: (email: string, password: string) => boolean;
+  logout: () => void;
+  isOnboarded: boolean;
+  completeOnboarding: () => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const USERS_DB_KEY = 'greengold_users';
-const CURRENT_USER_KEY = 'greengold_currentUser';
-
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isOnboarded, setIsOnboarded] = useState(false);
 
-    useEffect(() => {
-        const loggedInUserEmail = localStorage.getItem(CURRENT_USER_KEY);
-        if (loggedInUserEmail) {
-            const users: User[] = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-            const foundUser = users.find(u => u.email === loggedInUserEmail);
-            if (foundUser) {
-                setUser(foundUser);
-                if (!foundUser.farmName || !foundUser.name) {
-                    setNeedsOnboarding(true);
-                }
-            }
-        }
-    }, []);
+  useEffect(() => {
+    // Check for saved user session
+    const savedUser = localStorage.getItem('greengold_user');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      // Check onboarding status for this user
+      const onboardingKey = `greengold_onboarded_${parsedUser.email}`;
+      const hasBeenOnboarded = localStorage.getItem(onboardingKey) === 'true';
+      setIsOnboarded(hasBeenOnboarded);
+    }
+  }, []);
 
-    const login = (email: string, pass: string): boolean => {
-        const users: User[] = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-        const foundUser = users.find(u => u.email === email && u.password === pass);
-        if (foundUser) {
-            setUser(foundUser);
-            localStorage.setItem(CURRENT_USER_KEY, foundUser.email);
-            if (!foundUser.farmName || !foundUser.name) {
-                setNeedsOnboarding(true);
-            }
-            return true;
-        }
-        return false;
-    };
+  const login = (email: string, password: string): boolean => {
+    // Mock login logic
+    if (email && password) {
+      const loggedInUser: User = { name: 'Jassim Al-Thani', email };
+      setUser(loggedInUser);
+      localStorage.setItem('greengold_user', JSON.stringify(loggedInUser));
+      
+      const onboardingKey = `greengold_onboarded_${email}`;
+      const hasBeenOnboarded = localStorage.getItem(onboardingKey) === 'true';
+      setIsOnboarded(hasBeenOnboarded);
+      return true;
+    }
+    return false;
+  };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem(CURRENT_USER_KEY);
-    };
+  const signUp = (email: string, password: string): boolean => {
+    // Mock sign-up logic
+     if (email && password) {
+      const newUser: User = { name: 'New Farmer', email };
+      setUser(newUser);
+      localStorage.setItem('greengold_user', JSON.stringify(newUser));
+      setIsOnboarded(false); // New users always need onboarding
+      return true;
+    }
+    return false;
+  };
 
-    const signUp = (email: string, pass: string): boolean => {
-        const users: User[] = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-        if (users.some(u => u.email === email)) {
-            return false; // User already exists
-        }
-        const newUser: User = { email, password: pass, name: '', farmName: '', farmSize: 0, primaryCrops: '' };
-        users.push(newUser);
-        localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-        setUser(newUser);
-        localStorage.setItem(CURRENT_USER_KEY, newUser.email);
-        setNeedsOnboarding(true);
-        return true;
-    };
-    
-    const completeOnboarding = (details: OnboardingDetails) => {
-        if (!user) return;
-        
-        const updatedUser = { ...user, ...details };
-        setUser(updatedUser);
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('greengold_user');
+  };
 
-        const users: User[] = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-        const userIndex = users.findIndex(u => u.email === user.email);
-        if (userIndex !== -1) {
-            users[userIndex] = updatedUser;
-            localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-        }
-        
-        setNeedsOnboarding(false);
-    };
+  const completeOnboarding = () => {
+      if(user){
+        const onboardingKey = `greengold_onboarded_${user.email}`;
+        localStorage.setItem(onboardingKey, 'true');
+        setIsOnboarded(true);
+      }
+  };
 
+  const value = { user, login, signUp, logout, isOnboarded, completeOnboarding };
 
-    const value = { user, needsOnboarding, login, logout, signUp, completeOnboarding };
-
-    return (
-        <UserContext.Provider value={value}>
-            {children}
-        </UserContext.Provider>
-    );
+  return (
+    <UserContext.Provider value={value}>
+      {children}
+    </UserContext.Provider>
+  );
 };

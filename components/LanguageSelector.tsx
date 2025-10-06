@@ -13,7 +13,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageSelect })
   };
 
   return (
-    <div className="fixed inset-0 bg-[#141615] flex flex-col items-center justify-center z-50 p-4 animate-fade-in">
+    <div className="fixed inset-0 bg-[#141615] flex flex-col items-center z-50 px-4 py-20 overflow-y-auto animate-fade-in">
       <div className="text-center w-full max-w-2xl mx-auto">
         <LogoIcon className="w-24 h-24 mx-auto mb-6 opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }} />
         <h1 className="text-3xl font-bold text-slate-200 mb-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms' }}>
@@ -23,7 +23,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageSelect })
           Please select your preferred language to get started.
         </p>
         
-        <div className="max-h-[50vh] overflow-y-auto pr-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '400ms' }}>
+        <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '400ms' }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {languages.map((lang, index) => (
               <button

@@ -1,339 +1,182 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChatMessage, NPKValues, Sender, WeatherCondition } from './types';
-import { getGeminiResponse, translateTexts } from './services/geminiService';
-import { getRuleBasedResponse } from './services/ruleBasedService';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocalization } from './hooks/useLocalization';
 import { useUser } from './hooks/useUser';
+import { ChatMessage, NPKValues, Sender, WeatherCondition } from './types';
+import { generateResponse } from './services/geminiService';
+import { getRuleBasedResponse } from './services/ruleBasedService';
+import { farmData } from './constants/farmData';
 
+import Header from './components/Header';
+import Dashboard from './components/Dashboard';
+import ChatPanel from './components/ChatPanel';
 import LanguageSelector from './components/LanguageSelector';
 import LoginScreen from './components/LoginScreen';
 import OnboardingScreen from './components/OnboardingScreen';
-import Dashboard from './components/Dashboard';
 import CameraCapture from './components/CameraCapture';
 import BottomNavBar from './components/BottomNavBar';
-import Header from './components/Header';
-import ChatPanel from './components/ChatPanel';
 import LogsPanel from './components/LogsPanel';
 import SettingsPanel from './components/SettingsPanel';
-import Spinner from './components/Spinner';
 
-// FIX: Add type definitions for the browser's Speech Recognition API to resolve TypeScript errors.
-interface SpeechRecognitionEvent extends Event {
-    resultIndex: number;
-    results: SpeechRecognitionResultList;
-}
-
-interface SpeechRecognitionResultList {
-    [index: number]: SpeechRecognitionResult;
-    length: number;
-    item(index: number): SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionResult {
-    [index: number]: SpeechRecognitionAlternative;
-    isFinal: boolean;
-    length: number;
-    item(index: number): SpeechRecognitionAlternative;
-}
-
-interface SpeechRecognitionAlternative {
-    transcript: string;
-    confidence: number;
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-    error: string;
-    message: string;
-}
-
-interface SpeechRecognition extends EventTarget {
-    continuous: boolean;
-    lang: string;
-    interimResults: boolean;
-    maxAlternatives: number;
-    onresult: (event: SpeechRecognitionEvent) => void;
-    onerror: (event: SpeechRecognitionErrorEvent) => void;
-    onstart: () => void;
-    onend: () => void;
-    start(): void;
-    stop(): void;
-}
-
-declare global {
-    interface Window {
-        SpeechRecognition: new () => SpeechRecognition;
-        webkitSpeechRecognition: new () => SpeechRecognition;
-    }
-}
-
-type AppView = 'main' | 'logs' | 'settings';
-type MobileView = 'dashboard' | 'chat';
+type View = 'dashboard' | 'chat' | 'logs' | 'settings';
 
 const App: React.FC = () => {
-    // Context and State Hooks
-    const { t, language, setLanguage } = useLocalization();
-    const { user, needsOnboarding, completeOnboarding, logout } = useUser();
-    
-    // App State Management
-    const [languageIsSelected, setLanguageIsSelected] = useState(false);
+    const { language, setLanguage, isLoaded } = useLocalization();
+    const { user, logout, isOnboarded, completeOnboarding } = useUser();
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-    const [isTranslating, setIsTranslating] = useState(false);
+    const [showLanguageSelector, setShowLanguageSelector] = useState(!localStorage.getItem('selectedLanguage'));
     
-    // UI State
-    const [currentView, setCurrentView] = useState<AppView>('main');
-    const [mobileView, setMobileView] = useState<MobileView>('dashboard');
-    const [showCamera, setShowCamera] = useState(false);
-
-    // Chat State
+    // App State
+    const [view, setView] = useState<View>('dashboard');
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
-    // Dashboard State
-    const [moisture, setMoisture] = useState(75);
-    const [isIrrigating, setIsIrrigating] = useState(false);
-    const [isDraining, setIsDraining] = useState(false);
-    const [weather, setWeather] = useState<WeatherCondition>('sunny');
-    const [phValue, setPhValue] = useState(6.8);
-    const [npkValues, setNpkValues] = useState<NPKValues>({ n: 18, p: 9, k: 15 });
-    const [salinity, setSalinity] = useState(1.8);
-
-    // Speech Recognition State
+    const [showCamera, setShowCamera] = useState(false);
+    
+    // Speech Recognition
     const [isListening, setIsListening] = useState(false);
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const recognitionRef = React.useRef<any>(null);
 
-    // Theme effect
+    // Farm State
+    const [moisture, setMoisture] = useState(farmData.moisture);
+    const [weather, setWeather] = useState<WeatherCondition>(farmData.weather);
+    const [phValue, setPhValue] = useState(farmData.phValue);
+    const [npkValues, setNpkValues] = useState<NPKValues>(farmData.npkValues);
+    const [salinity, setSalinity] = useState(farmData.salinity);
+    const farmState = { moisture, weather, phValue, npkValues, salinity };
+
+
     useEffect(() => {
         if (theme === 'dark') {
             document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
         } else {
             document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
         }
+        localStorage.setItem('theme', theme);
     }, [theme]);
-    
-    const toggleTheme = () => setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
 
-    // Speech recognition setup
     useEffect(() => {
-        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognitionAPI) {
-            const recognition = new SpeechRecognitionAPI();
-            recognition.continuous = true;
-            recognition.interimResults = true;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
             recognition.lang = language;
-            recognition.onresult = (event: SpeechRecognitionEvent) => {
-                let finalTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    }
-                }
-                if (finalTranscript) {
-                    setInput(prev => prev + finalTranscript);
-                }
-            };
-             recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-                console.error('Speech recognition error:', event.error);
-                setIsListening(false);
-            };
+            recognition.onstart = () => setIsListening(true);
             recognition.onend = () => setIsListening(false);
+            recognition.onresult = (event: any) => {
+                const transcript = event.results[0][0].transcript;
+                setInput(transcript);
+                handleSendMessage(transcript);
+            };
             recognitionRef.current = recognition;
         }
     }, [language]);
+
 
     const toggleListening = () => {
         if (isListening) {
             recognitionRef.current?.stop();
         } else {
-            setInput('');
             recognitionRef.current?.start();
         }
-        setIsListening(!isListening);
     };
 
-    const translateConversation = useCallback(async (targetLanguage: string) => {
-        setIsTranslating(true);
-        const originalMessages = messages; // Keep a copy
-        try {
-            const textsToTranslate: string[] = [];
-            messages.forEach((msg) => {
-                msg.content.forEach((content) => {
-                    if (content.type === 'text' && content.originalValue) {
-                        textsToTranslate.push(content.originalValue);
-                    }
-                });
-                msg.suggestions?.forEach(suggestion => {
-                     textsToTranslate.push(suggestion.originalTitle, suggestion.originalPrompt);
-                });
-            });
+    const handleToggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    };
 
-            if (textsToTranslate.length > 0) {
-                const translatedTexts = await translateTexts(textsToTranslate, targetLanguage);
-                
-                let translatedIndex = 0;
-                const newMessages = messages.map(msg => ({
-                    ...msg,
-                    content: msg.content.map(content => {
-                        if (content.type === 'text' && content.originalValue) {
-                            return { ...content, value: translatedTexts[translatedIndex++] };
-                        }
-                        return content;
-                    }),
-                    suggestions: msg.suggestions?.map(suggestion => ({
-                        ...suggestion,
-                        title: translatedTexts[translatedIndex++],
-                        prompt: translatedTexts[translatedIndex++]
-                    }))
-                }));
-
-                setMessages(newMessages);
-            }
-        } catch (error) {
-            console.error("Translation failed, reverting:", error);
-            setMessages(originalMessages); // Revert on failure
-        } finally {
-            setIsTranslating(false);
-        }
-    }, [messages]);
-
-    const handleLanguageChange = (langCode: string) => {
+    const handleLanguageSelect = (langCode: string) => {
         setLanguage(langCode);
-        translateConversation(langCode);
+        localStorage.setItem('selectedLanguage', langCode);
+        setShowLanguageSelector(false);
     };
 
-    const handleInitialLanguageSelect = (langCode: string) => {
-        setLanguage(langCode);
-        setLanguageIsSelected(true);
-    };
+    const handleSendMessage = useCallback(async (promptOverride?: string, image?: string) => {
+        const textToSend = promptOverride || input;
+        if (!textToSend.trim() && !image) return;
 
-    const handleSendMessage = useCallback(async (prompt?: string, attachedImage?: string) => {
-        const messageText = prompt || input;
-        if (!messageText.trim() && !attachedImage) return;
-
-        setIsLoading(true);
-        setInput('');
-        
         const userMessage: ChatMessage = {
             id: Date.now().toString(),
             sender: Sender.USER,
-            content: [{ type: 'text', value: messageText }],
-            image: attachedImage || undefined,
+            content: [{ type: 'text', value: textToSend }],
+            image: image
         };
         setMessages(prev => [...prev, userMessage]);
+        setInput('');
+        setIsLoading(true);
+        setView('chat');
 
-        const ruleResponse = getRuleBasedResponse(messageText, language);
-        if (ruleResponse) {
-            setMessages(prev => [...prev, ruleResponse]);
-            setIsLoading(false);
+        // Check rule-based system first
+        const ruleBasedResponse = getRuleBasedResponse(textToSend, language);
+        if (ruleBasedResponse) {
+             setTimeout(() => {
+                setMessages(prev => [...prev, ruleBasedResponse]);
+                setIsLoading(false);
+            }, 1000);
             return;
         }
 
-        const farmContext = user ? `
-        CURRENT FARM DATA:
-        - User's Name: ${user.name}
-        - Farm Name: ${user.farmName}
-        - Farm Size: ${user.farmSize} hectares
-        - Primary Crops: ${user.primaryCrops}
-        - Soil Moisture: ${moisture.toFixed(1)}%
-        - Weather: ${weather}
-        - Soil pH: ${phValue.toFixed(1)}
-        - NPK Levels: N=${npkValues.n}, P=${npkValues.p}, K=${npkValues.k}
-        - Salinity (EC): ${salinity.toFixed(1)} dS/m
-        ` : 'No farm data available.';
-
-        const aiResponse = await getGeminiResponse(messageText, language, farmContext, userMessage.image);
-        
-        if (language !== 'en') {
-             const textsToTranslate: string[] = [];
-             aiResponse.content.forEach(c => { if(c.type === 'text' && c.value) textsToTranslate.push(c.value) });
-             aiResponse.suggestions?.forEach(s => { textsToTranslate.push(s.title, s.prompt) });
-
-             if (textsToTranslate.length > 0) {
-                 const translated = await translateTexts(textsToTranslate, language);
-                 let i = 0;
-                 aiResponse.content.forEach(c => { if(c.type === 'text' && c.value) c.value = translated[i++] });
-                 aiResponse.suggestions?.forEach(s => { s.title = translated[i++]; s.prompt = translated[i++] });
-             }
-        }
-
+        const aiResponse = await generateResponse(textToSend, messages, image);
         setMessages(prev => [...prev, aiResponse]);
         setIsLoading(false);
-    }, [input, language, user, moisture, weather, phValue, npkValues, salinity]);
-    
-    const handleImageCapture = (imageDataUrl: string) => {
+
+    }, [input, messages, language]);
+
+    const handleCapture = (imageDataUrl: string) => {
         setShowCamera(false);
-        handleSendMessage(t('analyzeImagePrompt'), imageDataUrl);
+        handleSendMessage('Analyze this image of my plant.', imageDataUrl);
     };
-    
-    const mainAppContent = (
-        <div className="h-full flex flex-col lg:flex-row bg-white dark:bg-[#202a25] relative overflow-hidden">
-            <Header onToggleTheme={toggleTheme} theme={theme} onLogout={logout} user={user} />
-            
-            <div className="flex-1 flex pt-16 lg:pt-0">
-                {/* Desktop: Fixed Dashboard */}
-                <div className="hidden lg:block lg:w-1/2 xl:w-3/5 border-r border-slate-200 dark:border-slate-800">
-                    <Dashboard user={user} onExplain={handleSendMessage} moisture={moisture} setMoisture={setMoisture} isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating} isDraining={isDraining} setIsDraining={setIsDraining} weather={weather} setWeather={setWeather} phValue={phValue} setPhValue={setPhValue} npkValues={npkValues} setNpkValues={setNpkValues} salinity={salinity} setSalinity={setSalinity}/>
-                </div>
 
-                {/* Mobile: Sliding Page Views */}
-                <div className="lg:hidden absolute top-16 bottom-16 left-0 right-0 overflow-hidden">
-                    <div className={`absolute inset-0 transition-transform duration-300 ease-out ${mobileView === 'dashboard' ? 'translate-x-0' : '-translate-x-full'}`}>
-                        <Dashboard user={user} onExplain={handleSendMessage} moisture={moisture} setMoisture={setMoisture} isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating} isDraining={isDraining} setIsDraining={setIsDraining} weather={weather} setWeather={setWeather} phValue={phValue} setPhValue={setPhValue} npkValues={npkValues} setNpkValues={setNpkValues} salinity={salinity} setSalinity={setSalinity} />
-                    </div>
-                    <div className={`absolute inset-0 transition-transform duration-300 ease-out ${mobileView === 'chat' ? 'translate-x-0' : 'translate-x-full'}`}>
-                       <ChatPanel messages={messages} isLoading={isLoading} input={input} setInput={setInput} handleSendMessage={handleSendMessage} setShowCamera={setShowCamera} isListening={isListening} toggleListening={toggleListening} handleLanguageChange={handleLanguageChange} />
-                    </div>
-                </div>
-                
-                {/* Desktop: Fixed Chat */}
-                <div className="hidden lg:flex lg:w-1/2 xl:w-2/5">
-                    <ChatPanel messages={messages} isLoading={isLoading} input={input} setInput={setInput} handleSendMessage={handleSendMessage} setShowCamera={setShowCamera} isListening={isListening} toggleListening={toggleListening} handleLanguageChange={handleLanguageChange} />
-                </div>
-            </div>
+    if (!isLoaded) return null; // Wait for translations
+    if (showLanguageSelector) return <LanguageSelector onLanguageSelect={handleLanguageSelect} />;
+    if (!user) return <LoginScreen />;
+    if (!isOnboarded) return <OnboardingScreen onComplete={completeOnboarding} />;
 
-            <BottomNavBar activeView={mobileView} setActiveView={setMobileView} onSettingsClick={() => setCurrentView('settings')} onLogsClick={() => setCurrentView('logs')} />
-        </div>
-    );
-
-    const renderApp = () => {
-        if (!languageIsSelected) {
-            return <LanguageSelector onLanguageSelect={handleInitialLanguageSelect} />;
-        }
-
-        if (!user) {
-            return <LoginScreen />;
-        }
-
-        if (needsOnboarding) {
-            return <OnboardingScreen user={user} onComplete={completeOnboarding} />;
-        }
-
-        switch (currentView) {
-            case 'logs':
-                return <LogsPanel onBack={() => setCurrentView('main')} farmState={{ moisture, weather, phValue, npkValues, salinity }} />;
-            case 'settings':
-                return <SettingsPanel onBack={() => setCurrentView('main')} />;
-            case 'main':
-            default:
-                return mainAppContent;
-        }
-    };
-    
     return (
-        <>
-            {renderApp()}
-            {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}
-            {isTranslating && (
-                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
-                    <div className="bg-white dark:bg-[#202a25] rounded-lg p-6 flex items-center gap-4">
-                        <Spinner />
-                        <span className="font-semibold">{t('translatingConversation')}</span>
-                    </div>
+        <div className="bg-slate-100 dark:bg-[#141615] text-slate-800 dark:text-slate-100 min-h-screen font-sans flex flex-col md:flex-row">
+            {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleCapture} />}
+            
+            <div className="hidden md:flex md:w-1/2 lg:w-2/5 xl:w-1/3 flex-col h-screen">
+                <ChatPanel 
+                    messages={messages}
+                    isLoading={isLoading}
+                    input={input}
+                    setInput={setInput}
+                    handleSendMessage={handleSendMessage}
+                    setShowCamera={setShowCamera}
+                    isListening={isListening}
+                    toggleListening={toggleListening}
+                    handleLanguageChange={setLanguage}
+                />
+            </div>
+            
+            <main className="flex-1 flex flex-col h-screen overflow-y-auto">
+                <Header onToggleTheme={handleToggleTheme} theme={theme} onLogout={logout} user={user}/>
+                <div className="flex-1 pt-16 pb-20 md:pb-0 overflow-y-auto">
+                   {view === 'dashboard' && <Dashboard onExplain={handleSendMessage} farmState={farmState} setFarmState={{ setMoisture, setWeather, setPhValue, setNpkValues, setSalinity }} />}
+                   {view === 'logs' && <LogsPanel onBack={() => setView('dashboard')} farmState={farmState} />}
+                   {view === 'settings' && <SettingsPanel onLogout={logout} />}
+
+                   <div className="md:hidden p-4">
+                     {view === 'chat' && (
+                         <div className="h-[calc(100vh-8rem)]">
+                            <ChatPanel 
+                                messages={messages}
+                                isLoading={isLoading}
+                                input={input}
+                                setInput={setInput}
+                                handleSendMessage={handleSendMessage}
+                                setShowCamera={setShowCamera}
+                                isListening={isListening}
+                                toggleListening={toggleListening}
+                                handleLanguageChange={setLanguage}
+                            />
+                         </div>
+                     )}
+                   </div>
                 </div>
-            )}
-        </>
+                <BottomNavBar currentView={view} setView={setView} />
+            </main>
+        </div>
     );
 };
 
