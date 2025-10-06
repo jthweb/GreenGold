@@ -32,7 +32,7 @@
     <style>
       html, body, #root {
         height: 100%;
-        overflow: hidden;
+        overflow-x: hidden;
       }
       body {
         font-family: 'Inter', sans-serif;
@@ -89,6 +89,10 @@
       @keyframes slide-in-up { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
       .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
       .animate-slide-in-up { animation: slide-in-up 0.5s ease-out forwards; }
+      @keyframes slide-in-bottom { 0% { transform: translateY(15px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+      .animate-slide-in-bottom { animation: slide-in-bottom 0.4s ease-out forwards; }
+      @keyframes subtle-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+      .animate-subtle-pulse { animation: subtle-pulse 2.5s ease-in-out infinite; }
     </style>
 <script type="importmap">
 {

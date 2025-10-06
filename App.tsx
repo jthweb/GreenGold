@@ -16,7 +16,7 @@ import TTSButton from './components/TTSButton';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { marked } from 'marked';
 
-import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon, PaperClipIcon, MicrophoneIcon } from './components/Icons';
+import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon, UploadIcon, MicrophoneIcon } from './components/Icons';
 
 // FIX: Add type definitions for the browser's Speech Recognition API to resolve TypeScript errors.
 interface SpeechRecognitionEvent extends Event {
@@ -398,7 +398,7 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                         </div>
                     )}
                     {messages.map(msg => (
-                        <div key={msg.id} className={`flex gap-3 ${msg.sender === Sender.USER ? 'justify-end' : 'justify-start'}`}>
+                        <div key={msg.id} className={`flex gap-3 animate-slide-in-bottom ${msg.sender === Sender.USER ? 'justify-end' : 'justify-start'}`}>
                             {msg.sender === Sender.AI && <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4A5C50] to-[#38483E] flex-shrink-0 flex items-center justify-center"><LogoIcon className="w-6 h-6" /></div>}
                             <div className={`max-w-sm md:max-w-md ${msg.sender === Sender.USER ? 'items-end' : 'items-start'} flex flex-col`}>
                                 <div className={`p-3 rounded-2xl relative ${msg.sender === Sender.USER ? 'bg-[#D4A22E] text-white rounded-br-none' : 'bg-white dark:bg-[#202a25] text-slate-800 dark:text-slate-100 rounded-bl-none'}`}>
@@ -430,7 +430,7 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                         </div>
                     ))}
                     {isLoading && (
-                        <div className="flex gap-3 justify-start">
+                        <div className="flex gap-3 justify-start animate-slide-in-bottom">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4A5C50] to-[#38483E] flex-shrink-0 flex items-center justify-center"><LogoIcon className="w-6 h-6" /></div>
                             <div className="p-3 rounded-2xl bg-white dark:bg-[#202a25] rounded-bl-none flex items-center">
                                 <Spinner className="w-5 h-5 text-[#D4A22E]" />
@@ -478,7 +478,7 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                                 className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
                                 title={t('attachFile')}
                              >
-                                <PaperClipIcon className="w-6 h-6" />
+                                <UploadIcon className="w-6 h-6" />
                             </button>
                              <button
                                 onClick={() => setShowCamera(true)}

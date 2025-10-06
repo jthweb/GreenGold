@@ -38,6 +38,7 @@
   "startIrrigation": "灌漑開始",
   "stopIrrigation": "灌漑停止",
   "drainingExcess": "余剰水を排水中...",
+  "drainWater": "排水",
   "cropDistribution": "作物分布",
   "wheat": "小麦",
   "maize": "トウモロコシ",

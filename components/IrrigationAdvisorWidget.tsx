@@ -1,7 +1,7 @@
 // FIX: This file was created to provide a smart irrigation advisor widget.
 import React from 'react';
 import WidgetWrapper from './WidgetWrapper';
-import { SmartIrrigationIcon, PHIcon, SunIcon, ArrowTrendingUpIcon } from './Icons';
+import { SmartIrrigationIcon, PHIcon, SunIcon, ArrowTrendingUpIcon, CloudRainIcon, QuestionMarkCircleIcon, CheckCircleIcon, ExclamationTriangleIcon, ArrowPathIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 import { WeatherCondition } from '../types';
 
@@ -38,8 +38,9 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
                 title: t('irrigationInProgress'),
                 text: t('irrigationInProgressDesc'),
                 color: 'text-blue-500',
-                iconColor: 'text-blue-500',
-                factors
+                icon: ArrowPathIcon,
+                factors,
+                animation: 'animate-spin'
             };
         }
         if (weather === 'rainy') {
@@ -47,7 +48,7 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
                 title: t('rainExpected'),
                 text: t('rainExpectedDesc'),
                 color: 'text-slate-500',
-                iconColor: 'text-slate-500',
+                icon: CloudRainIcon,
                 factors
             };
         }
@@ -56,8 +57,9 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
                 title: t('immediateAction'),
                 text: t('immediateActionDesc'),
                 color: 'text-red-500',
-                iconColor: 'text-red-500',
-                factors
+                icon: ExclamationTriangleIcon,
+                factors,
+                animation: 'animate-subtle-pulse'
             };
         }
         if (moisture < 60) {
@@ -65,7 +67,7 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
                 title: t('considerIrrigation'),
                 text: t('considerIrrigationDesc'),
                 color: 'text-amber-500',
-                iconColor: 'text-amber-500',
+                icon: QuestionMarkCircleIcon,
                 factors
             };
         }
@@ -73,12 +75,13 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
             title: t('moistureOptimal'),
             text: t('moistureOptimalDesc'),
             color: 'text-green-500',
-            iconColor: 'text-green-500',
+            icon: CheckCircleIcon,
             factors
         };
     };
 
     const advice = getAdvice();
+    const AdviceIcon = advice.icon;
 
     return (
         <WidgetWrapper
@@ -89,7 +92,7 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
         >
             <div className="flex flex-col text-center h-full">
                 <div className="flex-1 flex flex-col items-center justify-center">
-                    <SmartIrrigationIcon className={`w-10 h-10 mb-2 ${advice.iconColor}`} />
+                    <AdviceIcon className={`w-10 h-10 mb-2 ${advice.color} ${advice.animation || ''}`} />
                     <h4 className={`text-base font-bold ${advice.color}`}>{advice.title}</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{advice.text}</p>
                 </div>

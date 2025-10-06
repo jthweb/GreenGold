@@ -40,8 +40,8 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ onLanguageChange })
                 </svg>
             </button>
             {isOpen && (
-                <div className="absolute end-0 mt-2 w-48 bg-white dark:bg-[#202a25] rounded-lg shadow-xl z-20 ring-1 ring-black ring-opacity-5">
-                    <div className="py-1">
+                <div className="absolute end-0 mt-2 w-56 bg-white dark:bg-[#202a25] rounded-lg shadow-xl z-20 ring-1 ring-black ring-opacity-5">
+                    <div className="py-1 max-h-72 overflow-y-auto">
                         {languages.map(lang => (
                              <button
                                 key={lang.code}

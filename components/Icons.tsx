@@ -142,9 +142,9 @@ export const PhotoIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
-export const PaperClipIcon: React.FC<{ className?: string }> = ({ className }) => (
+export const UploadIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3.375 3.375 0 0119.5 7.372l-8.55 8.55a.75.75 0 01-1.06-1.06l8.55-8.55a4.875 4.875 0 00-6.89-6.89l-10.94 10.94a6.375 6.375 0 008.98 9.03l7.693-7.693a.75.75 0 011.06 1.06z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
     </svg>
 );
 
@@ -219,5 +219,24 @@ export const FlaskIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 5.25a3 3 0 0 1-3 3-3 3 0 0 1-3-3M6.375 12.375c0-1.036.84-1.875 1.875-1.875h7.5c1.036 0 1.875.84 1.875 1.875v6.375c0 1.035-.84 1.875-1.875 1.875h-7.5A1.875 1.875 0 0 1 6.375 18.75v-6.375z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 12.375V18.75M9 3.75h6" />
+    </svg>
+);
+
+export const DrainIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10.5l5.25-5.25L12 8.25l3.75-3.75L21 10.5m-18 0v2.25a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 12.75V10.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15.75v3" />
+    </svg>
+);
+
+export const CheckCircleIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+);
+
+export const ExclamationTriangleIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
     </svg>
 );

@@ -4,7 +4,7 @@ import React, { createContext, useState, useEffect, useCallback, ReactNode } fro
 interface LocalizationContextType {
   language: string;
   setLanguage: (language: string) => void;
-  t: (key: string) => string;
+  t: (key: string, replacements?: Record<string, string | number>) => string;
 }
 
 // Create the context with a default value
@@ -50,9 +50,14 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     setLanguageState(lang);
   };
 
-  // The translation function `t`
-  const t = (key: string): string => {
-    return translations[key] || key;
+  // The translation function `t` with placeholder support
+  const t = (key: string, replacements: Record<string, string | number> = {}): string => {
+    let translation = translations[key] || key;
+    Object.keys(replacements).forEach(rKey => {
+        const regex = new RegExp(`{${rKey}}`, 'g');
+        translation = translation.replace(regex, String(replacements[rKey]));
+    });
+    return translation;
   };
 
   const value = {

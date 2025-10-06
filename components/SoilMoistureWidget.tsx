@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { DropletIcon, PlayIcon, StopIcon } from './Icons';
+import { DropletIcon, PlayIcon, StopIcon, DrainIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 import { WeatherCondition } from '../types';
 
@@ -9,10 +9,11 @@ interface SoilMoistureWidgetProps {
     isDraining: boolean;
     setMoisture: (value: React.SetStateAction<number>) => void;
     setIsIrrigating: (value: React.SetStateAction<boolean>) => void;
+    setIsDraining: (value: React.SetStateAction<boolean>) => void;
     weather: WeatherCondition;
 }
 
-const SoilMoistureWidget: React.FC<SoilMoistureWidgetProps> = ({ moisture, isIrrigating, isDraining, setMoisture, setIsIrrigating, weather }) => {
+const SoilMoistureWidget: React.FC<SoilMoistureWidgetProps> = ({ moisture, isIrrigating, isDraining, setMoisture, setIsIrrigating, setIsDraining, weather }) => {
     const { t } = useLocalization();
     const intervalRef = useRef<number | null>(null);
 
@@ -101,14 +102,24 @@ const SoilMoistureWidget: React.FC<SoilMoistureWidgetProps> = ({ moisture, isIrr
                     {isDraining && <span className="text-xs text-red-500 animate-pulse">{t('drainingExcess')}</span>}
                 </div>
             </div>
-             <button
-                onClick={() => setIsIrrigating(!isIrrigating)}
-                className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={moisture >= 100 || isDraining || (weather === 'rainy')}
-            >
-                {isIrrigating ? <StopIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
-                {isIrrigating ? t('stopIrrigation') : t('startIrrigation')}
-            </button>
+             <div className="flex items-center gap-2 mt-3 w-full">
+                <button
+                    onClick={() => setIsIrrigating(!isIrrigating)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={moisture >= 100 || isDraining || (weather === 'rainy')}
+                >
+                    {isIrrigating ? <StopIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
+                    {isIrrigating ? t('stopIrrigation') : t('startIrrigation')}
+                </button>
+                 <button
+                    onClick={() => setIsDraining(true)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={moisture < 90 || isDraining || isIrrigating}
+                >
+                    <DrainIcon className="w-5 h-5" />
+                    {t('drainWater')}
+                </button>
+            </div>
         </div>
     );
 };
