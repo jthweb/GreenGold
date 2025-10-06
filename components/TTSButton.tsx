@@ -7,20 +7,24 @@ interface TTSButtonProps {
 }
 
 const TTSButton: React.FC<TTSButtonProps> = ({ text }) => {
-    const { t } = useLocalization();
+    const { t, language } = useLocalization();
     const [isSpeaking, setIsSpeaking] = useState(false);
     const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
 
     useEffect(() => {
         const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = language; // Set the language for the utterance
         utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
+        utterance.onerror = (e) => {
+            console.error("Speech synthesis error:", e);
+            setIsSpeaking(false);
+        };
         utteranceRef.current = utterance;
         
         return () => {
             window.speechSynthesis.cancel();
         };
-    }, [text]);
+    }, [text, language]);
 
     useEffect(() => {
         const handleBeforeUnload = () => {

@@ -16,7 +16,7 @@ import TTSButton from './components/TTSButton';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { marked } from 'marked';
 
-import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon } from './components/Icons';
+import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon, PaperClipIcon } from './components/Icons';
 
 const App: React.FC = () => {
     // State variables
@@ -40,9 +40,10 @@ const App: React.FC = () => {
     const [npkValues, setNpkValues] = useState<NPKValues>({ n: 13, p: 7, k: 12 });
     const [salinity, setSalinity] = useState(1.8);
 
-    // Image capture state
+    // Image capture and upload state
     const [showCamera, setShowCamera] = useState(false);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -207,6 +208,20 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
         handleSendMessage(t('analyzeImagePrompt'), imageDataUrl);
     };
 
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageDataUrl = e.target?.result as string;
+                handleImageCapture(imageDataUrl); // Use the same flow as camera capture
+            };
+            reader.readAsDataURL(file);
+        }
+        // Reset file input to allow selecting the same file again
+        if(event.target) event.target.value = '';
+    };
+
     const handleDashboardExplain = (prompt: string) => {
         handleSendMessage(prompt);
     };
@@ -342,10 +357,17 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                                 }
                             }}
                             placeholder={t('inputPlaceholder')}
-                            className="w-full p-3 pr-24 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#202a25] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none resize-none"
+                            className="w-full p-3 pr-32 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#202a25] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none resize-none"
                             rows={1}
                         />
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                             <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+                                title={t('attachFile')}
+                             >
+                                <PaperClipIcon className="w-6 h-6" />
+                            </button>
                              <button
                                 onClick={() => setShowCamera(true)}
                                 className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
@@ -363,12 +385,18 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                         </div>
                     </div>
                 </div>
-                <p className="text-center text-xs text-slate-400 dark:text-slate-500 py-1 flex-shrink-0 bg-slate-50 dark:bg-[#1A221E]">Made by JThweb</p>
+                 <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*"
+                />
+                {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}
             </div>
-
-            {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}
         </div>
     );
 };
 
+// FIX: Add default export for the App component.
 export default App;

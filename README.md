@@ -24,11 +24,11 @@ This isn't just an app; it's a partner for your farm. It combines a real-time da
 ## Key Features
 
 -   **Interactive AI Chat**: Have a conversation with an AI that understands your farm's live data. Ask questions, get advice, and receive clear, actionable steps.
--   **Visual Plant Health Analysis**: Snap a photo of a plant, and our AI will analyze its health, identify potential issues, and suggest solutions.
+-   **Visual Plant Health Analysis**: Snap a photo of a plant or upload an image file, and our AI will analyze its health, identify potential issues, and suggest solutions.
 -   **All-in-One Farm Dashboard**: See everything at a glance with our comprehensive suite of widgets.
 -   **Multi-Language Support**: The interface and AI responses are available in over a dozen languages to support farmers globally.
 -   **Clear Data Visuals**: We turn complex data into simple charts and graphs, so you always know what's happening on your farm.
--   **Text-to-Speech**: Listen to the AI's advice, perfect for when you're busy in the field.
+-   **Language-Aware Text-to-Speech**: Listen to the AI's advice in the selected language, perfect for when you're busy in the field.
 -   **Light & Dark Modes**: Choose the theme that works best for your environment.
 
 ## The Dashboard at a Glance
@@ -46,12 +46,12 @@ Our dashboard provides a live, interactive overview of your farm's key metrics:
 
 ## Supported Languages
 
-The app is currently available in: English, Hindi, Kannada, Spanish, Portuguese, Bengali, French, Arabic, Mandarin, German, Italian, Russian, Japanese, and Korean.
+The app is currently available in: English, Arabic, Hindi, Malayalam, Bengali, Chinese (Mandarin), Dutch, French, German, Indonesian, Italian, Japanese, Kannada, Korean, Portuguese, Russian, Spanish, and Turkish.
 
 ## Built With
 
 -   **Frontend**: React, TypeScript, Tailwind CSS
--   **AI**: Google Gemini API
+-   **AI**: gemma3:latest (trained with multiple opensource datasets from Kaggle)
 -   **Charting**: Custom SVG components
 
 ## Future Plans
@@ -68,29 +68,20 @@ Want to run GreenGold on your own machine? Here’s how.
 
 ### Prerequisites
 
-You'll need an API key from Google AI Studio to power the AI features.
+You'll need an API key. This project is configured to read it from an environment variable named `API_KEY`.
 
 ### Local Development
 
-This project is set up to run directly in a browser-based development environment that can serve static files and manage environment variables.
+This project is built with TypeScript and React, but it uses a modern browser-based setup with import maps, so there's no complex build step required for development.
 
-1.  **Set up your environment variables:**
-    Your development environment needs a variable named `API_KEY` set to your valid Gemini API Key. The application is coded to read this key directly.
+1.  **Set up your environment variable**: In the environment where you will serve the files, ensure the `API_KEY` variable is set to your valid API key. The application will not work without it.
 
-2.  **Serve the files:**
-    Use a simple static file server (like VS Code's Live Server) to serve the `index.html` file from the root directory.
+2.  **Serve the project folder**: Use a simple local web server to serve the project's root directory.
+    -   **Using VS Code's Live Server Extension**: Simply right-click on `index.html` and select "Open with Live Server".
+    -   **Using Python**: In your terminal, run `python -m http.server`.
+    -   **Using Node.js**: Install `serve` globally (`npm install -g serve`) and run `serve` in the project directory.
 
-### Deployment
-
-This is a static web application, so you can host it anywhere you like.
-
-1.  **Deploy the project folder** to a static hosting provider such as:
-    -   Vercel
-    -   Netlify
-    -   Firebase Hosting
-    -   Google Cloud Storage
-
-2.  **Configure your environment variable**: This is the most important step! In your hosting provider's settings, you must add the `API_KEY` environment variable. The application will not work without it.
+Once the server is running, open your browser to the provided local address.
 
 ## How to Contribute
 
