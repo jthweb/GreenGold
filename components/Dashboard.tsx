@@ -11,7 +11,7 @@ import ImpactWidget from './ImpactWidget';
 import SalinityWidget from './SalinityWidget';
 import PHWidget from './PHWidget';
 import NPKWidget from './NPKWidget';
-import { WeatherCondition, NPKValues, User } from '../types';
+import { WeatherCondition, NPKValues, User, IdealConditions } from '../types';
 import TimeOfDayWidget from './TimeOfDayWidget';
 import IrrigationAdvisorWidget from './IrrigationAdvisorWidget';
 import { useLocalization } from '../hooks/useLocalization';
@@ -19,6 +19,7 @@ import ActionsWidget from './ActionsWidget';
 
 interface DashboardProps {
     user: User | null;
+    idealConditions?: IdealConditions;
     onExplain: (prompt: string) => void;
     moisture: number;
     setMoisture: React.Dispatch<React.SetStateAction<number>>;
@@ -38,7 +39,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
     const { t } = useLocalization();
-    const { user, onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues, salinity, setSalinity } = props;
+    const { user, idealConditions, onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues, salinity, setSalinity } = props;
 
     // Effect for rain simulation
     React.useEffect(() => {
@@ -60,21 +61,21 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
         };
     }, [weather, isIrrigating, isDraining, setMoisture]);
 
-    // Effect for draining excess water
+    // BUG FIX: Corrected draining logic to reliably decrease moisture.
     React.useEffect(() => {
         let drainInterval: number | null = null;
         if (isDraining) {
             drainInterval = window.setInterval(() => {
                 setMoisture(prev => {
-                    const newMoisture = prev - 0.25;
-                    if (newMoisture <= 95) { // Drain to a slightly lower threshold
+                    const newMoisture = prev - 0.5; // Increased drain rate
+                    if (newMoisture <= 30) { 
                         if (drainInterval) clearInterval(drainInterval);
                         setIsDraining(false);
-                        return 95;
+                        return 30;
                     }
                     return newMoisture;
                 });
-            }, 150);
+            }, 100);
         }
         return () => {
             if (drainInterval) clearInterval(drainInterval);
@@ -98,25 +99,28 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
     }, [isIrrigating, isDraining, weather, setMoisture]);
     
     return (
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-100 dark:bg-[#141615] pb-20 lg:pb-8">
+        <div className="p-4 sm:p-6 lg:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-min gap-6">
                 
-                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '100ms'}}>
-                    <WidgetWrapper title={user?.name || t('farmerName')} explanation={t('timeOfDayExplain')} explanationPrompt={t('timeOfDayExplainPrompt')} onExplain={onExplain}><TimeOfDayWidget user={user} /></WidgetWrapper>
+                <div className="md:col-span-2 lg:col-span-4 opacity-0 animate-slide-in-up" style={{ animationDelay: '100ms'}}>
+                    <WidgetWrapper title="" explanation="" explanationPrompt="" onExplain={() => {}} hasNoHeader>
+                        <TimeOfDayWidget user={user} />
+                    </WidgetWrapper>
                 </div>
-
-                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms'}}>
+                
+                <div className="md:col-span-2 lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms'}}>
                      <WidgetWrapper title={t('weather')} explanation={t('weatherExplain')} explanationPrompt={t('weatherExplainPrompt')} onExplain={onExplain}><WeatherWidget weather={weather} setWeather={setWeather} /></WidgetWrapper>
                 </div>
                 
-                <div className="lg:col-span-2 lg:row-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '300ms'}}>
-                    <IrrigationAdvisorWidget onExplain={onExplain} isIrrigating={isIrrigating} moisture={moisture} weather={weather} phValue={phValue} />
+                <div className="md:col-span-2 lg:col-span-2 lg:row-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '300ms'}}>
+                    <IrrigationAdvisorWidget idealRange={idealConditions?.moisture} onExplain={onExplain} isIrrigating={isIrrigating} moisture={moisture} weather={weather} phValue={phValue} />
                 </div>
 
-                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '400ms'}}>
+                <div className="md:col-span-2 lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '400ms'}}>
                      <WidgetWrapper title={t('soilMoisture')} explanation={t('soilMoistureExplain')} explanationPrompt={t('soilMoistureExplainPrompt')} onExplain={onExplain}>
                         <SoilMoistureWidget 
                             moisture={moisture} 
+                            idealRange={idealConditions?.moisture}
                             isIrrigating={isIrrigating} 
                             isDraining={isDraining}
                             setMoisture={setMoisture} 
@@ -140,7 +144,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
                 </div>
 
                 <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '800ms'}}>
-                    <WidgetWrapper title={t('soilPH')} explanation={t('phExplain')} explanationPrompt={t('phExplainPrompt')} onExplain={onExplain}><PHWidget phValue={phValue} setPhValue={setPhValue} /></WidgetWrapper>
+                    <WidgetWrapper title={t('soilPH')} explanation={t('phExplain')} explanationPrompt={t('phExplainPrompt')} onExplain={onExplain}><PHWidget phValue={phValue} setPhValue={setPhValue} idealRange={idealConditions?.ph} /></WidgetWrapper>
                 </div>
                 
                 <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '900ms'}}>
@@ -148,11 +152,11 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
                 </div>
                 
                 <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '1000ms'}}>
-                    <WidgetWrapper title={t('marketAnalysis')} explanation={t('marketAnalysisExplain')} explanationPrompt={t('marketAnalysisExplainPrompt')} onExplain={onExplain}><MarketAnalysisWidget /></WidgetWrapper>
+                    <WidgetWrapper title={t('marketAnalysis')} explanation={t('marketAnalysisExplain')} explanationPrompt={t('marketAnalysisExplainPrompt')} onExplain={onExplain}><MarketAnalysisWidget crops={user?.primaryCrops || ""} /></WidgetWrapper>
                 </div>
 
                 <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '1100ms'}}>
-                    <WidgetWrapper title={t('cropDistribution')} explanation={t('cropDistributionExplain')} explanationPrompt={t('cropDistributionExplainPrompt')} onExplain={onExplain}><CropDistributionWidget /></WidgetWrapper>
+                    <WidgetWrapper title={t('cropDistribution')} explanation={t('cropDistributionExplain')} explanationPrompt={t('cropDistributionExplainPrompt')} onExplain={onExplain}><CropDistributionWidget crops={user?.primaryCrops || ""} /></WidgetWrapper>
                 </div>
 
                 <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '1200ms'}}>

@@ -46,14 +46,25 @@ export interface FarmDetails {
     farmName: string;
     farmSize: number;
     primaryCrops: string;
+    soilType: string;
 }
 
-// FIX: Added 'name' to the User interface and created a separate OnboardingDetails type.
-export interface OnboardingDetails extends FarmDetails {
+export interface IdealConditions {
+    moisture: { min: number; max: number };
+    ph: { min: number; max: number };
+}
+
+export interface User extends FarmDetails {
     name: string;
-}
-
-export interface User extends OnboardingDetails {
     email: string;
-    password?: string; // Optional for security reasons when handling user objects
+    password?: string;
+    idealConditions?: IdealConditions;
+}
+// FIX: Add OnboardingDetails type definition.
+export interface OnboardingDetails {
+    name: string;
+    farmName: string;
+    farmSize: number;
+    primaryCrops: string;
+    soilType: string;
 }

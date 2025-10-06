@@ -1,5 +1,5 @@
 import React from 'react';
-import { HomeIcon, ChatBubbleLeftEllipsisIcon, Cog6ToothIcon, DocumentTextIcon } from './Icons';
+import { HomeIcon, ChatBubbleLeftEllipsisIcon, Cog6ToothIcon, ClipboardDocumentCheckIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
 type MobileView = 'dashboard' | 'chat';
@@ -19,13 +19,12 @@ const NavButton: React.FC<{
 }> = ({ label, icon: Icon, isActive, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center justify-center gap-1 w-full pt-2 pb-1 transition-all duration-300 ease-out transform ${isActive ? ' text-[#D4A22E]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
+        className={`relative flex flex-col items-center justify-center w-full h-full transition-colors duration-200 ease-out ${isActive ? 'text-[#D4A22E]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
     >
-        <div className={`relative transition-all duration-300 ease-out ${isActive ? '-translate-y-2' : 'translate-y-0'}`}>
-            <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-[#D4A22E] rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`}></div>
-            <Icon className="w-6 h-6" />
+        <div className="relative h-7 w-7 flex items-center justify-center">
+             <Icon className={`w-6 h-6 transition-transform duration-300 ease-out ${isActive ? '-translate-y-2' : ''}`} />
         </div>
-        <span className={`text-xs font-semibold transition-all duration-200 ${isActive ? 'opacity-100' : 'opacity-0 -translate-y-1'}`}>{label}</span>
+        <span className={`text-xs font-bold absolute bottom-1 transition-opacity duration-300 ease-out ${isActive ? 'opacity-100' : 'opacity-0'}`}>{label}</span>
     </button>
 );
 
@@ -50,7 +49,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, setActiveView, 
                 />
                  <NavButton
                     label={t('logs')}
-                    icon={DocumentTextIcon}
+                    icon={ClipboardDocumentCheckIcon}
                     isActive={false}
                     onClick={onLogsClick}
                 />

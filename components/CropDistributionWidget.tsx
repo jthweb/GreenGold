@@ -3,13 +3,38 @@ import React from 'react';
 import DoughnutChart from './DoughnutChart';
 import { useLocalization } from '../hooks/useLocalization';
 
-const CropDistributionWidget: React.FC = () => {
+interface CropDistributionWidgetProps {
+    crops: string;
+}
+
+const COLORS = ['#D4A22E', '#FBBF24', '#4A5C50', '#8D9A92', '#A9907E'];
+
+const CropDistributionWidget: React.FC<CropDistributionWidgetProps> = ({ crops }) => {
     const { t } = useLocalization();
-    const cropData = [
-        { label: t('wheat'), value: 50, color: '#D4A22E' },
-        { label: t('barley'), value: 30, color: '#FBBF24' },
-        { label: t('rapeseed'), value: 20, color: '#4A5C50' },
-    ];
+    
+    // Create dynamic data from the user's crop list
+    const cropList = crops.split(',').map(c => c.trim()).filter(Boolean);
+    const distribution = 100 / (cropList.length || 1);
+    
+    const cropData = cropList.map((crop, index) => ({
+        label: crop,
+        value: Math.round(distribution),
+        color: COLORS[index % COLORS.length]
+    }));
+
+    // Adjust last item to ensure total is 100
+    if (cropData.length > 0) {
+        const sum = cropData.slice(0, -1).reduce((acc, item) => acc + item.value, 0);
+        cropData[cropData.length - 1].value = 100 - sum;
+    }
+    
+    if (cropData.length === 0) {
+        return (
+             <div className="h-full flex flex-col justify-center items-center text-center">
+                 <p className="text-sm text-slate-500 dark:text-slate-400">No crops defined.</p>
+             </div>
+        )
+    }
 
     return (
         <div className="h-full flex flex-col justify-center">

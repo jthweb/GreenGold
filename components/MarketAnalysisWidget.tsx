@@ -3,13 +3,34 @@ import React from 'react';
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
-const MarketAnalysisWidget: React.FC = () => {
+interface MarketAnalysisWidgetProps {
+    crops: string;
+}
+
+const MarketAnalysisWidget: React.FC<MarketAnalysisWidgetProps> = ({ crops }) => {
     const { t } = useLocalization();
-    const marketData = [
-        { crop: t('wheat'), trend: 'up', change: '+1.8%', color: 'text-green-600 dark:text-green-400' },
-        { crop: t('barley'), trend: 'up', change: '+0.5%', color: 'text-green-600 dark:text-green-400' },
-        { crop: t('rapeseed'), trend: 'down', change: '-0.9%', color: 'text-red-600 dark:text-red-400' },
-    ];
+    
+    const cropList = crops.split(',').map(c => c.trim()).filter(Boolean);
+
+    const marketData = cropList.map((crop, index) => {
+        // Simple seeded random for consistent trends
+        const trend = (crop.length + index) % 2 === 0 ? 'up' : 'down';
+        const change = (Math.random() * 2 + 0.5).toFixed(1);
+        return {
+            crop: crop,
+            trend: trend,
+            change: `${trend === 'up' ? '+' : '-'}${change}%`,
+            color: trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+        };
+    });
+    
+    if (marketData.length === 0) {
+         return (
+             <div className="h-full flex flex-col justify-center items-center text-center">
+                 <p className="text-sm text-slate-500 dark:text-slate-400">No crops to analyze.</p>
+             </div>
+        )
+    }
     
     return (
         <div className="h-full flex flex-col justify-center">

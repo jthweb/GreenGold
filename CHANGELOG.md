@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-10-06
+
+### Added
+- **Desktop Navigation**: Added icons for "Logs" and "Settings" to the main header for easier access on desktop and larger screens.
+- **Changelog Access**: Added a "View Changelog" button in the Settings panel to allow users to see the latest project updates.
+
+### Changed
+- **Premium UI Polish**: Redesigned the mobile bottom navigation bar with smoother, more modern animations. The active icon now gracefully slides up as its label fades in, removing the old underline indicator.
+- **Onboarding Experience**: The transitions between onboarding steps are now smoothly animated for a more polished user flow.
+
+### Fixed
+- **Critical Onboarding Bug**: Fixed a major bug where pressing "Enter" in the name field would prematurely submit the form and skip the remaining setup steps.
+- **Desktop Layout**: Fixed a critical layout issue where the fixed header would overlap and block content on desktop views. The main content area is now correctly padded.
+- **Theme Switching**: The layout fix also resolved an issue where the theme toggle button could become unclickable due to overlapping elements.
+
+## [1.6.0] - 2025-10-06
+
+### Added
+- **AI-Powered Personalization**: The app now calls the Gemini API upon user onboarding to determine the ideal moisture and pH ranges for the user's specific crops and soil type.
+- **Functional Settings Panel**: Implemented a full settings page where users can update their name, password, and all farm details (size, crops, soil type). Changes are saved persistently.
+- **Dynamic Widgets**: The `SoilMoistureWidget`, `PHWidget`, and `IrrigationAdvisorWidget` now use the AI-generated ideal conditions to provide truly personalized advice and visual alerts.
+- **Dynamic Crop Widgets**: The `CropDistributionWidget` and `MarketAnalysisWidget` now dynamically display data based on the crops in the user's profile.
+
+### Changed
+- **UI/UX Overhaul**: Replaced all major icons with a new, consistent, open-source set (Heroicons) for a more professional look.
+- **Improved Animations**:
+    - The irrigation-in-progress indicator is now a more visually appealing "wave" animation.
+    - The moisture droplet icon now pulses when levels are outside the ideal range.
+    - The water bubble animation is more fluid and continuous.
+- **Onboarding Flow**: Expanded the onboarding process to be a more comprehensive, multi-step flow that now includes `soilType` selection.
+- **Dashboard Layout**: Ensured the main widget area is scrollable on all screen sizes.
+
+### Fixed
+- **Draining Logic**: Corrected a critical bug where the "Drain Water" function was not decreasing the moisture level. It now works as expected.
+- **Irrigation Advisor Logic**: Fixed a bug where moisture levels above 100% were incorrectly reported as "Optimal". The advisor now correctly identifies this state as "Saturated".
+
 ## [1.5.0] - 2025-10-06
 
 ### Added
@@ -15,9 +51,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Persistent Header**: Added a new header component with the GreenGold logo, theme switcher, and a logout button for authenticated users.
 
 ### Changed
-- **UI/UX Overhaul**: Replaced all major icons (AI Agent, Settings, Logs, Home, Chat, etc.) with a new, custom-designed SVG set for a more unique and polished visual identity.
-- **Animations**: Improved the water bubble animation for a more realistic effect and added new hover and click animations throughout the app.
-- **Widget Logic**: Updated the "Drain Water" button to be enabled whenever moisture is above 30%. Updated the "Start Irrigation" button to allow irrigation up to 110% moisture.
 - **README**: Removed the outdated mention of the hackathon event.
 
 ## [1.4.0] - 2025-10-06
@@ -25,7 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Mobile Navigation**: Implemented a dedicated bottom navigation bar for mobile views, featuring animated transitions for a more app-like experience.
 - **AI Feedback**: Added a subtle "breathing" animation to the AI agent icon to indicate when it is processing a request.
-- **Scrolling**: Enabled vertical scrolling on the main dashboard to ensure all widgets are accessible on any screen size.
 
 ### Changed
 - **Responsive Layout**: Reworked the application layout to completely hide the dashboard widgets when the chat view is active on mobile, providing a focused, full-screen experience.

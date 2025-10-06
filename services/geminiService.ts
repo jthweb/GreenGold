@@ -1,6 +1,6 @@
 // FIX: This file was created to provide Gemini API integration for the application.
 import { GoogleGenAI, Type } from '@google/genai';
-import { ChatMessage, MessageContent, Sender, TopicSuggestion, VisualizationData } from '../types';
+import { ChatMessage, MessageContent, Sender, TopicSuggestion, VisualizationData, IdealConditions } from '../types';
 
 // FIX: Initialize GoogleGenAI client according to coding guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -85,6 +85,52 @@ const batchTranslateSchema = {
     required: ["translations"]
 };
 
+const idealConditionsSchema = {
+    type: Type.OBJECT,
+    properties: {
+        moisture: {
+            type: Type.OBJECT,
+            properties: {
+                min: { type: Type.NUMBER },
+                max: { type: Type.NUMBER }
+            },
+            required: ["min", "max"]
+        },
+        ph: {
+            type: Type.OBJECT,
+            properties: {
+                min: { type: Type.NUMBER },
+                max: { type: Type.NUMBER }
+            },
+            required: ["min", "max"]
+        }
+    },
+    required: ["moisture", "ph"]
+};
+
+export const getIdealConditions = async (crops: string, soilType: string): Promise<IdealConditions> => {
+    const prompt = `For the following crops: "${crops}" in "${soilType}" soil, what is the ideal range for soil moisture percentage and the ideal range for soil pH? Provide only the JSON object.`;
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: { parts: [{ text: prompt }] },
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: idealConditionsSchema,
+            }
+        });
+        const jsonText = response.text.trim();
+        return JSON.parse(jsonText) as IdealConditions;
+    } catch (error) {
+        console.error("Error fetching ideal conditions:", error);
+        // Return a safe default if AI fails
+        return {
+            moisture: { min: 60, max: 80 },
+            ph: { min: 6.5, max: 7.0 }
+        };
+    }
+};
+
 export const getGeminiResponse = async (prompt: string, language: string, farmContext: string, image?: string): Promise<ChatMessage> => {
     
     const contentParts = [];
@@ -126,21 +172,30 @@ export const getGeminiResponse = async (prompt: string, language: string, farmCo
             }
         });
         
-        // FIX: Extract text and parse JSON response.
-        const jsonText = response.text;
+        // FIX: Made the Gemini response parsing more robust.
+        const jsonText = response.text.trim();
         let parsedResponse;
-        try {
-            parsedResponse = JSON.parse(jsonText);
-        } catch (e) {
-            console.error("Failed to parse JSON response:", jsonText);
-            // Handle cases where response is not valid JSON, maybe it's just a string.
+        
+        // Check if the response looks like JSON before parsing
+        if (jsonText.startsWith('{') && jsonText.endsWith('}')) {
+            try {
+                parsedResponse = JSON.parse(jsonText);
+            } catch (e) {
+                console.error("Failed to parse JSON response:", jsonText);
+                return {
+                    id: Date.now().toString(),
+                    sender: Sender.AI,
+                    content: [{ type: 'text', value: jsonText, originalValue: jsonText }]
+                };
+            }
+        } else {
+             // Handle cases where response is just a string.
             return {
                 id: Date.now().toString(),
                 sender: Sender.AI,
                 content: [{ type: 'text', value: jsonText, originalValue: jsonText }]
             };
         }
-
 
         const content: MessageContent[] = [];
 

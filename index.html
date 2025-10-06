@@ -34,22 +34,13 @@
         height: 100%;
         overflow-x: hidden;
       }
-      @keyframes subtle-bg-pan {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-      }
       body {
         font-family: 'Inter', sans-serif;
-        background-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)), url('https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?q=80&w=1974&auto=format&fit=crop');
-        background-size: 150% 150%;
-        background-position: center;
-        background-attachment: fixed;
-        transition: background-image 0.3s ease-in-out;
-        animation: subtle-bg-pan 90s ease-in-out infinite;
+        background-color: #f8fafc;
+        transition: background-color 0.3s ease-in-out;
       }
       .dark body {
-        background-image: linear-gradient(to bottom, rgba(20, 22, 21, 0.96), rgba(20, 22, 21, 0.96)), url('https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?q=80&w=1974&auto=format&fit=crop');
+        background-color: #141615;
       }
       @keyframes rise {
         0% {
@@ -76,6 +67,21 @@
         animation-name: rise;
         animation-timing-function: linear;
         animation-iteration-count: infinite;
+      }
+      @keyframes wave {
+        0% { transform: translateY(100%); opacity: 0.6; }
+        50% { opacity: 0.3; }
+        100% { transform: translateY(-10%); opacity: 0; }
+      }
+      .irrigation-wave {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 30%;
+          background: rgba(59, 130, 246, 0.3);
+          border-radius: 10px;
+          animation: wave 2s ease-out infinite;
       }
       @keyframes fertigate-drop {
         0% { transform: translateY(-100%); opacity: 0.7; }
@@ -105,7 +111,7 @@
       .animate-slide-in-up { animation: slide-in-up 0.5s ease-out forwards; }
       @keyframes slide-in-bottom { 0% { transform: translateY(15px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
       .animate-slide-in-bottom { animation: slide-in-bottom 0.4s ease-out forwards; }
-      @keyframes subtle-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+      @keyframes subtle-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } }
       .animate-subtle-pulse { animation: subtle-pulse 2.5s ease-in-out infinite; }
       @keyframes boing { 0%, 100% { transform: scale(1); } 20% { transform: scale(0.95); } 50% { transform: scale(1.1); } }
       .animate-boing { animation: boing 0.5s ease-out; }

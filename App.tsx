@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChatMessage, NPKValues, Sender, WeatherCondition } from './types';
-import { getGeminiResponse, translateTexts } from './services/geminiService';
+import { ChatMessage, NPKValues, Sender, WeatherCondition, User } from './types';
+import { getGeminiResponse, translateTexts, getIdealConditions } from './services/geminiService';
 import { getRuleBasedResponse } from './services/ruleBasedService';
 import { useLocalization } from './hooks/useLocalization';
 import { useUser } from './hooks/useUser';
@@ -71,12 +71,19 @@ type MobileView = 'dashboard' | 'chat';
 
 const App: React.FC = () => {
     // Context and State Hooks
-    const { t, language, setLanguage } = useLocalization();
-    const { user, needsOnboarding, completeOnboarding, logout } = useUser();
+    const { t, language, setLanguage, isLoaded } = useLocalization();
+    const { user, needsOnboarding, completeOnboarding, logout, updateUser } = useUser();
     
     // App State Management
     const [languageIsSelected, setLanguageIsSelected] = useState(false);
-    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+    const [theme, setTheme] = useState(() => {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) return storedTheme;
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+        }
+        return 'light';
+    });
     const [isTranslating, setIsTranslating] = useState(false);
     
     // UI State
@@ -144,11 +151,12 @@ const App: React.FC = () => {
     }, [language]);
 
     const toggleListening = () => {
+        if (!recognitionRef.current) return;
         if (isListening) {
-            recognitionRef.current?.stop();
+            recognitionRef.current.stop();
         } else {
             setInput('');
-            recognitionRef.current?.start();
+            recognitionRef.current.start();
         }
         setIsListening(!isListening);
     };
@@ -218,7 +226,7 @@ const App: React.FC = () => {
         const userMessage: ChatMessage = {
             id: Date.now().toString(),
             sender: Sender.USER,
-            content: [{ type: 'text', value: messageText }],
+            content: [{ type: 'text', value: messageText, originalValue: messageText }],
             image: attachedImage || undefined,
         };
         setMessages(prev => [...prev, userMessage]);
@@ -236,6 +244,9 @@ const App: React.FC = () => {
         - Farm Name: ${user.farmName}
         - Farm Size: ${user.farmSize} hectares
         - Primary Crops: ${user.primaryCrops}
+        - Soil Type: ${user.soilType}
+        - Ideal Moisture Range: ${user.idealConditions?.moisture.min}% - ${user.idealConditions?.moisture.max}%
+        - Ideal pH Range: ${user.idealConditions?.ph.min} - ${user.idealConditions?.ph.max}
         - Soil Moisture: ${moisture.toFixed(1)}%
         - Weather: ${weather}
         - Soil pH: ${phValue.toFixed(1)}
@@ -245,18 +256,9 @@ const App: React.FC = () => {
 
         const aiResponse = await getGeminiResponse(messageText, language, farmContext, userMessage.image);
         
-        if (language !== 'en') {
-             const textsToTranslate: string[] = [];
-             aiResponse.content.forEach(c => { if(c.type === 'text' && c.value) textsToTranslate.push(c.value) });
-             aiResponse.suggestions?.forEach(s => { textsToTranslate.push(s.title, s.prompt) });
-
-             if (textsToTranslate.length > 0) {
-                 const translated = await translateTexts(textsToTranslate, language);
-                 let i = 0;
-                 aiResponse.content.forEach(c => { if(c.type === 'text' && c.value) c.value = translated[i++] });
-                 aiResponse.suggestions?.forEach(s => { s.title = translated[i++]; s.prompt = translated[i++] });
-             }
-        }
+        // Ensure original values are set for future translations
+        aiResponse.content.forEach(c => { if(c.type === 'text' && c.value) c.originalValue = c.value; });
+        aiResponse.suggestions?.forEach(s => { s.originalTitle = s.title; s.originalPrompt = s.prompt; });
 
         setMessages(prev => [...prev, aiResponse]);
         setIsLoading(false);
@@ -268,19 +270,21 @@ const App: React.FC = () => {
     };
     
     const mainAppContent = (
-        <div className="h-full flex flex-col lg:flex-row bg-white dark:bg-[#202a25] relative overflow-hidden">
-            <Header onToggleTheme={toggleTheme} theme={theme} onLogout={logout} user={user} />
+        <div className="h-full flex flex-col lg:flex-row bg-slate-100 dark:bg-[#141615] relative overflow-hidden">
+            <Header onToggleTheme={toggleTheme} theme={theme} onLogout={logout} user={user} onSettingsClick={() => setCurrentView('settings')} onLogsClick={() => setCurrentView('logs')} />
             
-            <div className="flex-1 flex pt-16 lg:pt-0">
-                {/* Desktop: Fixed Dashboard */}
-                <div className="hidden lg:block lg:w-1/2 xl:w-3/5 border-r border-slate-200 dark:border-slate-800">
-                    <Dashboard user={user} onExplain={handleSendMessage} moisture={moisture} setMoisture={setMoisture} isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating} isDraining={isDraining} setIsDraining={setIsDraining} weather={weather} setWeather={setWeather} phValue={phValue} setPhValue={setPhValue} npkValues={npkValues} setNpkValues={setNpkValues} salinity={salinity} setSalinity={setSalinity}/>
+            <div className="flex-1 flex pt-16 overflow-hidden">
+                {/* Desktop: Fixed Dashboard (Scrollable) */}
+                <div className="hidden lg:block lg:w-1/2 xl:w-3/5 border-r border-slate-200 dark:border-slate-800 overflow-y-auto">
+                    <Dashboard user={user} idealConditions={user?.idealConditions} onExplain={handleSendMessage} moisture={moisture} setMoisture={setMoisture} isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating} isDraining={isDraining} setIsDraining={setIsDraining} weather={weather} setWeather={setWeather} phValue={phValue} setPhValue={setPhValue} npkValues={npkValues} setNpkValues={setNpkValues} salinity={salinity} setSalinity={setSalinity}/>
                 </div>
 
                 {/* Mobile: Sliding Page Views */}
                 <div className="lg:hidden absolute top-16 bottom-16 left-0 right-0 overflow-hidden">
                     <div className={`absolute inset-0 transition-transform duration-300 ease-out ${mobileView === 'dashboard' ? 'translate-x-0' : '-translate-x-full'}`}>
-                        <Dashboard user={user} onExplain={handleSendMessage} moisture={moisture} setMoisture={setMoisture} isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating} isDraining={isDraining} setIsDraining={setIsDraining} weather={weather} setWeather={setWeather} phValue={phValue} setPhValue={setPhValue} npkValues={npkValues} setNpkValues={setNpkValues} salinity={salinity} setSalinity={setSalinity} />
+                        <div className="h-full overflow-y-auto">
+                           <Dashboard user={user} idealConditions={user?.idealConditions} onExplain={handleSendMessage} moisture={moisture} setMoisture={setMoisture} isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating} isDraining={isDraining} setIsDraining={setIsDraining} weather={weather} setWeather={setWeather} phValue={phValue} setPhValue={setPhValue} npkValues={npkValues} setNpkValues={setNpkValues} salinity={salinity} setSalinity={setSalinity} />
+                        </div>
                     </div>
                     <div className={`absolute inset-0 transition-transform duration-300 ease-out ${mobileView === 'chat' ? 'translate-x-0' : 'translate-x-full'}`}>
                        <ChatPanel messages={messages} isLoading={isLoading} input={input} setInput={setInput} handleSendMessage={handleSendMessage} setShowCamera={setShowCamera} isListening={isListening} toggleListening={toggleListening} handleLanguageChange={handleLanguageChange} />
@@ -298,6 +302,10 @@ const App: React.FC = () => {
     );
 
     const renderApp = () => {
+        if (!isLoaded) {
+            return <div className="fixed inset-0 bg-slate-100 dark:bg-[#141615] flex items-center justify-center"><Spinner className="w-10 h-10" /></div>;
+        }
+
         if (!languageIsSelected) {
             return <LanguageSelector onLanguageSelect={handleInitialLanguageSelect} />;
         }
@@ -307,7 +315,7 @@ const App: React.FC = () => {
         }
 
         if (needsOnboarding) {
-            return <OnboardingScreen user={user} onComplete={completeOnboarding} />;
+            return <OnboardingScreen onComplete={completeOnboarding} />;
         }
 
         switch (currentView) {

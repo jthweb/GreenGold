@@ -5,16 +5,20 @@ import { useLocalization } from '../hooks/useLocalization';
 interface PHWidgetProps {
     phValue: number;
     setPhValue: React.Dispatch<React.SetStateAction<number>>;
+    idealRange?: { min: number; max: number };
 }
 
-const PHWidget: React.FC<PHWidgetProps> = ({ phValue, setPhValue }) => {
+const PHWidget: React.FC<PHWidgetProps> = ({ phValue, setPhValue, idealRange }) => {
     const { t } = useLocalization();
     const [isAdjusting, setIsAdjusting] = useState(false);
     const intervalRef = useRef<number | null>(null);
 
+    const minIdeal = idealRange?.min ?? 6.5;
+    const maxIdeal = idealRange?.max ?? 7.0;
+
     const getStatus = (ph: number) => {
-        if (ph < 6.5) return { text: t('acidic'), color: 'text-orange-500' };
-        if (ph <= 7.0) return { text: t('ideal'), color: 'text-green-500' };
+        if (ph < minIdeal) return { text: t('acidic'), color: 'text-orange-500' };
+        if (ph <= maxIdeal) return { text: t('ideal'), color: 'text-green-500' };
         return { text: t('alkaline'), color: 'text-purple-500' };
     };
 
@@ -22,12 +26,12 @@ const PHWidget: React.FC<PHWidgetProps> = ({ phValue, setPhValue }) => {
         if (isAdjusting) return;
         setIsAdjusting(true);
 
+        const target = direction === 'acidic' ? maxIdeal - 0.1 : minIdeal + 0.1;
+
         intervalRef.current = window.setInterval(() => {
             setPhValue(prev => {
                 const step = 0.05;
                 let nextVal;
-                
-                const target = direction === 'acidic' ? 6.5 : 7.0;
 
                 if (direction === 'acidic') {
                     nextVal = Math.max(target, prev - step);
@@ -35,9 +39,10 @@ const PHWidget: React.FC<PHWidgetProps> = ({ phValue, setPhValue }) => {
                     nextVal = Math.min(target, prev + step);
                 }
                 
-                if (nextVal === target) {
+                if ((direction === 'acidic' && nextVal <= target) || (direction === 'basic' && nextVal >= target)) {
                     if(intervalRef.current) clearInterval(intervalRef.current);
                     setIsAdjusting(false);
+                    return parseFloat(target.toFixed(2));
                 }
                 
                 return parseFloat(nextVal.toFixed(2));
@@ -52,8 +57,8 @@ const PHWidget: React.FC<PHWidgetProps> = ({ phValue, setPhValue }) => {
     }, []);
 
     const status = getStatus(phValue);
-    const isAcidicDisabled = phValue <= 6.5;
-    const isBasicDisabled = phValue >= 7.0;
+    const isAcidicDisabled = phValue <= minIdeal;
+    const isBasicDisabled = phValue >= maxIdeal;
 
     return (
         <div className="flex flex-col justify-between h-full">

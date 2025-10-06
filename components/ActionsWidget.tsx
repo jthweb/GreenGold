@@ -1,8 +1,10 @@
 
 
 
+
 import React from 'react';
-import { PlusIcon, FlaskIcon, SunIcon } from './Icons';
+// FIX: Replaced FlaskIcon with the available BeakerIcon to resolve an import error.
+import { PlusIcon, BeakerIcon, SunIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
 const ActionButton: React.FC<{ icon: React.FC<{className?: string}>, label: string, onClick: () => void }> = ({ icon: Icon, label, onClick }) => (
@@ -17,7 +19,7 @@ const ActionsWidget: React.FC<{ onExplain: (prompt: string) => void }> = ({ onEx
     return (
         <div className="grid grid-cols-3 gap-2 h-full items-stretch">
             <ActionButton icon={PlusIcon} label={t('newLog')} onClick={() => onExplain(t('newLogPrompt'))} />
-            <ActionButton icon={FlaskIcon} label={t('soilTest')} onClick={() => onExplain(t('soilTestPrompt'))} />
+            <ActionButton icon={BeakerIcon} label={t('soilTest')} onClick={() => onExplain(t('soilTestPrompt'))} />
             <ActionButton icon={SunIcon} label={t('weather')} onClick={() => onExplain(t('weatherPrompt'))} />
         </div>
     );

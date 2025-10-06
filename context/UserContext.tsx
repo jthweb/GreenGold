@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
+// FIX: Imported the missing OnboardingDetails type.
 import { User, OnboardingDetails } from '../types';
 
 interface UserContextType {
@@ -8,6 +9,8 @@ interface UserContextType {
     logout: () => void;
     signUp: (email: string, pass: string) => boolean;
     completeOnboarding: (details: OnboardingDetails) => void;
+    // FIX: Added updateUser to the context type to allow components to update user details.
+    updateUser: (details: Partial<User>) => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -57,7 +60,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (users.some(u => u.email === email)) {
             return false; // User already exists
         }
-        const newUser: User = { email, password: pass, name: '', farmName: '', farmSize: 0, primaryCrops: '' };
+        // FIX: Added the missing required 'soilType' property when creating a new user.
+        const newUser: User = { email, password: pass, name: '', farmName: '', farmSize: 0, primaryCrops: '', soilType: '' };
         users.push(newUser);
         localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
         setUser(newUser);
@@ -82,8 +86,23 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setNeedsOnboarding(false);
     };
 
+    // FIX: Added the updateUser function to handle profile updates.
+    const updateUser = (details: Partial<User>) => {
+        if (!user) return;
+        
+        const updatedUser = { ...user, ...details };
+        setUser(updatedUser);
 
-    const value = { user, needsOnboarding, login, logout, signUp, completeOnboarding };
+        const users: User[] = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
+        const userIndex = users.findIndex(u => u.email === user.email);
+        if (userIndex !== -1) {
+            users[userIndex] = updatedUser;
+            localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+        }
+    };
+
+
+    const value = { user, needsOnboarding, login, logout, signUp, completeOnboarding, updateUser };
 
     return (
         <UserContext.Provider value={value}>

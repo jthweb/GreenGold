@@ -1,5 +1,6 @@
 import React from 'react';
-import { WifiIcon, BeakerIcon, ClipboardDocumentListIcon } from './Icons';
+// FIX: Replaced WifiIcon and ClipboardDocumentListIcon with available icons SmartIrrigationIcon and ClipboardDocumentCheckIcon.
+import { SmartIrrigationIcon, BeakerIcon, ClipboardDocumentCheckIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
 interface InitialActionsProps {
@@ -10,9 +11,9 @@ const InitialActions: React.FC<InitialActionsProps> = ({ onAction }) => {
     const { t } = useLocalization();
 
     const initialActions = [
-      { label: t('smartIrrigation'), prompt: t('smartIrrigationPrompt'), icon: WifiIcon, color: 'blue' },
+      { label: t('smartIrrigation'), prompt: t('smartIrrigationPrompt'), icon: SmartIrrigationIcon, color: 'blue' },
       { label: t('salinityCheck'), prompt: t('salinityCheckPrompt'), icon: BeakerIcon, color: 'gray' },
-      { label: t('fertigationPlan'), prompt: t('fertigationPlanPrompt'), icon: ClipboardDocumentListIcon, color: 'green' }
+      { label: t('fertigationPlan'), prompt: t('fertigationPlanPrompt'), icon: ClipboardDocumentCheckIcon, color: 'green' }
     ];
 
     return (

@@ -8,7 +8,8 @@ import Spinner from './Spinner';
 import InitialActions from './InitialActions';
 import TTSButton from './TTSButton';
 import LanguageSwitcher from './LanguageSwitcher';
-import { AIAgentIcon, UserIcon, PaperAirplaneIcon, UploadIcon, CameraIcon, MicrophoneIcon } from './Icons';
+// FIX: Replaced UploadIcon with the available ArrowUpTrayIcon.
+import { AIAgentIcon, UserIcon, PaperAirplaneIcon, ArrowUpTrayIcon, CameraIcon, MicrophoneIcon } from './Icons';
 
 interface ChatPanelProps {
     messages: ChatMessage[];
@@ -135,7 +136,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                         className="flex-1 resize-none p-3 text-sm rounded-full border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-[#1A221E] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none"
                     />
                      <label className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer">
-                        <UploadIcon className="w-6 h-6" />
+                        <ArrowUpTrayIcon className="w-6 h-6" />
                         <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                     </label>
                     <button onClick={() => setShowCamera(true)} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
@@ -145,9 +146,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                         <PaperAirplaneIcon className="w-6 h-6" />
                     </button>
                 </div>
-                <p className="text-center text-xs text-slate-400 mt-2">
-                    Made by JThweb
-                </p>
             </div>
         </div>
     );

@@ -1,7 +1,5 @@
-// FIX: This file was created to provide a smart irrigation advisor widget.
 import React from 'react';
 import WidgetWrapper from './WidgetWrapper';
-// FIX: Added the SmartIrrigationIcon to the Icons.tsx file and imported it here to resolve the missing member error.
 import { SmartIrrigationIcon, PHIcon, SunIcon, ArrowTrendingUpIcon, CloudRainIcon, QuestionMarkCircleIcon, CheckCircleIcon, ExclamationTriangleIcon, ArrowPathIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 import { WeatherCondition } from '../types';
@@ -12,6 +10,7 @@ interface IrrigationAdvisorWidgetProps {
     moisture: number;
     weather: WeatherCondition;
     phValue: number;
+    idealRange?: { min: number; max: number };
 }
 
 const AdviceContext: React.FC<{icon: React.FC<{className?: string}>, text: string, color: string}> = ({ icon: Icon, text, color }) => (
@@ -21,7 +20,7 @@ const AdviceContext: React.FC<{icon: React.FC<{className?: string}>, text: strin
     </div>
 );
 
-const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExplain, isIrrigating, moisture, weather, phValue }) => {
+const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExplain, isIrrigating, moisture, weather, phValue, idealRange }) => {
     const { t } = useLocalization();
 
     const getAdvice = () => {
@@ -33,6 +32,9 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
             { icon: ArrowTrendingUpIcon, text: t('advisorContextMarket'), color: 'text-green-500' },
             { icon: SmartIrrigationIcon, text: t('advisorContextImpact'), color: 'text-blue-500' },
         ];
+        
+        const minIdeal = idealRange?.min ?? 60;
+        const maxIdeal = idealRange?.max ?? 80;
 
         if (isIrrigating) {
             return {
@@ -53,7 +55,16 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
                 factors
             };
         }
-        if (moisture < 40) {
+        if (moisture > 100) {
+            return {
+                title: t('saturated'),
+                text: t('saturatedDesc'),
+                color: 'text-red-500',
+                icon: ExclamationTriangleIcon,
+                factors
+            };
+        }
+        if (moisture < minIdeal - 10) { // More urgent threshold
             return {
                 title: t('immediateAction'),
                 text: t('immediateActionDesc'),
@@ -63,7 +74,7 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
                 animation: 'animate-subtle-pulse'
             };
         }
-        if (moisture < 60) {
+        if (moisture < minIdeal) {
             return {
                 title: t('considerIrrigation'),
                 text: t('considerIrrigationDesc'),
@@ -72,10 +83,20 @@ const IrrigationAdvisorWidget: React.FC<IrrigationAdvisorWidgetProps> = ({ onExp
                 factors
             };
         }
+        if (moisture <= maxIdeal) {
+            return {
+                title: t('moistureOptimal'),
+                text: t('moistureOptimalDesc'),
+                color: 'text-green-500',
+                icon: CheckCircleIcon,
+                factors
+            };
+        }
+        // Moisture is above ideal but not yet saturated
         return {
-            title: t('moistureOptimal'),
-            text: t('moistureOptimalDesc'),
-            color: 'text-green-500',
+            title: t('moistureHigh'),
+            text: t('moistureHighDesc'),
+            color: 'text-sky-500',
             icon: CheckCircleIcon,
             factors
         };

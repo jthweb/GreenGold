@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FlaskIcon, DropletIcon } from './Icons';
+// FIX: Replaced the missing FlaskIcon with the available BeakerIcon.
+import { BeakerIcon, DropletIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 import { NPKValues } from '../types';
 
@@ -77,7 +78,7 @@ const NPKWidget: React.FC<NPKWidgetProps> = ({ npkValues, setNpkValues }) => {
                 disabled={isFertilizing}
                 className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                <FlaskIcon className="w-5 h-5" />
+                <BeakerIcon className="w-5 h-5" />
                 {isFertilizing ? t('fertigating') : t('fertigate')}
             </button>
         </div>
