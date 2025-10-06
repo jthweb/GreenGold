@@ -113,5 +113,10 @@
   "speakMessage": "ಸಂದೇಶವನ್ನು ಮಾತನಾಡಿ",
   "stopSpeaking": "ಮಾತನಾಡುವುದನ್ನು ನಿಲ್ಲಿಸಿ",
   "language": "ಭಾಷೆ",
-  "translatingConversation": "ಸಂಭಾಷಣೆಯನ್ನು ಅನುವಾದಿಸಲಾಗುತ್ತಿದೆ..."
+  "translatingConversation": "ಸಂಭಾಷಣೆಯನ್ನು ಅನುವಾದಿಸಲಾಗುತ್ತಿದೆ...",
+  "home": "ಮನೆ",
+  "chat": "ಚಾಟ್",
+  "settings": "ಸಂಯೋಜನೆಗಳು",
+  "logs": "ಲಾಗ್‌ಗಳು",
+  "comingSoon": "ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ..."
 }

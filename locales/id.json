@@ -38,6 +38,7 @@
   "startIrrigation": "Mulai Irigasi",
   "stopIrrigation": "Hentikan Irigasi",
   "drainingExcess": "Membuang kelebihan...",
+  "drainWater": "Kuras Air",
   "cropDistribution": "Distribusi Tanaman",
   "wheat": "Gandum",
   "maize": "Jagung",
@@ -119,5 +120,10 @@
   "speakMessage": "Ucapkan pesan",
   "stopSpeaking": "Hentikan bicara",
   "language": "Bahasa",
-  "translatingConversation": "Menerjemahkan percakapan..."
+  "translatingConversation": "Menerjemahkan percakapan...",
+  "home": "Beranda",
+  "chat": "Obrolan",
+  "settings": "Pengaturan",
+  "logs": "Log",
+  "comingSoon": "segera hadir..."
 }

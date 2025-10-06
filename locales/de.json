@@ -125,5 +125,10 @@
   "speak": "Sprechen",
   "speechError": "Spracherkennung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "language": "Sprache",
-  "translatingConversation": "Übersetze Gespräch..."
+  "translatingConversation": "Übersetze Gespräch...",
+  "home": "Startseite",
+  "chat": "Chat",
+  "settings": "Einstellungen",
+  "logs": "Protokolle",
+  "comingSoon": "kommt bald..."
 }

@@ -120,5 +120,10 @@
   "speak": "বলুন",
   "speechError": "বক্তৃতা সনাক্তকরণ ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
   "language": "ভাষা",
-  "translatingConversation": "কথোপকথন অনুবাদ করা হচ্ছে..."
+  "translatingConversation": "কথোপকথন অনুবাদ করা হচ্ছে...",
+  "home": "হোম",
+  "chat": "চ্যাট",
+  "settings": "সেটিংস",
+  "logs": "লগ",
+  "comingSoon": "শীঘ্রই আসছে..."
 }

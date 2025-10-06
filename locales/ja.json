@@ -125,5 +125,10 @@
   "speak": "話す",
   "speechError": "音声認識に失敗しました。もう一度お試しください。",
   "language": "言語",
-  "translatingConversation": "会話を翻訳中..."
+  "translatingConversation": "会話を翻訳中...",
+  "home": "ホーム",
+  "chat": "チャット",
+  "settings": "設定",
+  "logs": "ログ",
+  "comingSoon": "近日公開..."
 }

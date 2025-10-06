@@ -125,5 +125,10 @@
   "speak": "Говорить",
   "speechError": "Распознавание речи не удалось. Пожалуйста, попробуйте еще раз.",
   "language": "Язык",
-  "translatingConversation": "Перевод разговора..."
+  "translatingConversation": "Перевод разговора...",
+  "home": "Главная",
+  "chat": "Чат",
+  "settings": "Настройки",
+  "logs": "Журналы",
+  "comingSoon": "скоро..."
 }

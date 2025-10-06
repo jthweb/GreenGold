@@ -120,5 +120,10 @@
   "speak": "说话",
   "speechError": "语音识别失败。请重试。",
   "language": "语言",
-  "translatingConversation": "正在翻译对话..."
+  "translatingConversation": "正在翻译对话...",
+  "home": "主页",
+  "chat": "聊天",
+  "settings": "设置",
+  "logs": "日志",
+  "comingSoon": "即将推出..."
 }

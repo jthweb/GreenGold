@@ -125,5 +125,10 @@
   "speak": "Speak",
   "speechError": "Speech recognition failed. Please try again.",
   "language": "Language",
-  "translatingConversation": "Translating conversation..."
+  "translatingConversation": "Translating conversation...",
+  "home": "Home",
+  "chat": "Chat",
+  "settings": "Settings",
+  "logs": "Logs",
+  "comingSoon": "coming soon..."
 }

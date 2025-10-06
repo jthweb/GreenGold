@@ -120,5 +120,10 @@
   "speak": "Parler",
   "speechError": "La reconnaissance vocale a échoué. Veuillez réessayer.",
   "language": "Langue",
-  "translatingConversation": "Traduction de la conversation..."
+  "translatingConversation": "Traduction de la conversation...",
+  "home": "Accueil",
+  "chat": "Chat",
+  "settings": "Paramètres",
+  "logs": "Journaux",
+  "comingSoon": "bientôt disponible..."
 }

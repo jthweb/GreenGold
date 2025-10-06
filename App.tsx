@@ -14,6 +14,7 @@ import CameraCapture from './components/CameraCapture';
 import InitialActions from './components/InitialActions';
 import TTSButton from './components/TTSButton';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import BottomNavBar from './components/BottomNavBar';
 import { marked } from 'marked';
 
 import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon, UploadIcon, MicrophoneIcon } from './components/Icons';
@@ -67,6 +68,21 @@ declare global {
     }
 }
 
+type MobileView = 'dashboard' | 'chat';
+
+const ModalPlaceholder: React.FC<{ title: string; onClose: () => void }> = ({ title, onClose }) => {
+    // FIX: Call the `useLocalization` hook to get the translation function `t`.
+    const { t } = useLocalization();
+    return (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in-fast" onClick={onClose}>
+            <div className="bg-white dark:bg-[#202a25] rounded-lg shadow-xl p-6 text-center" onClick={e => e.stopPropagation()}>
+                <h2 className="text-lg font-bold text-[#D4A22E] mb-2">{title}</h2>
+                <p>{title} {t('comingSoon')}</p>
+            </div>
+        </div>
+    );
+};
+
 
 const App: React.FC = () => {
     // State variables
@@ -76,10 +92,15 @@ const App: React.FC = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isTranslating, setIsTranslating] = useState(false);
-    const [showDashboard, setShowDashboard] = useState(true);
     const chatEndRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+    
+    // View management
+    const [activeView, setActiveView] = useState<MobileView>('dashboard');
+    const [showSettings, setShowSettings] = useState(false);
+    const [showLogs, setShowLogs] = useState(false);
+
 
     // Dashboard state
     const [moisture, setMoisture] = useState(75);
@@ -135,9 +156,10 @@ const App: React.FC = () => {
         setInput('');
         setCapturedImage(null);
         setIsLoading(true);
+        
         // On mobile, switch to chat view when a message is sent
         if (window.innerWidth < 1024) {
-            setShowDashboard(false);
+            setActiveView('chat');
         }
 
         // First, check rule-based service for a direct match
@@ -340,172 +362,180 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
     }
 
     return (
-        <div className="flex h-screen bg-white dark:bg-[#1A221E] text-slate-800 dark:text-slate-200 font-sans overflow-hidden">
-            {/* Dashboard Panel - visible on lg screens, toggled on mobile */}
-            <div className={`transition-all duration-500 ease-in-out h-full flex flex-col flex-shrink-0 ${showDashboard ? 'w-full lg:w-3/5 xl:w-2/3' : 'w-0'}`}>
-                <div className={`${showDashboard ? 'block' : 'hidden'} lg:block h-full`}>
-                    <Dashboard 
-                        onExplain={handleDashboardExplain}
-                        moisture={moisture} setMoisture={setMoisture}
-                        isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating}
-                        isDraining={isDraining} setIsDraining={setIsDraining}
-                        weather={weather} setWeather={setWeather}
-                        phValue={phValue} setPhValue={setPhValue}
-                        npkValues={npkValues} setNpkValues={setNpkValues}
-                        salinity={salinity} setSalinity={setSalinity}
-                    />
+        <div className="h-screen bg-white dark:bg-[#1A221E] text-slate-800 dark:text-slate-200 font-sans flex flex-col lg:flex-row overflow-hidden">
+             {/* Main content area */}
+            <main className="flex-1 flex lg:flex-row overflow-hidden">
+                {/* Dashboard Panel */}
+                <div className={`h-full flex-shrink-0 transition-all duration-300 ease-in-out ${activeView === 'dashboard' ? 'w-full animate-fade-in-fast' : 'w-0'} lg:w-3/5 xl:w-2/3 lg:flex flex-col`}>
+                    <div className={`${activeView === 'dashboard' ? 'flex' : 'hidden'} lg:flex flex-col h-full`}>
+                        <Dashboard 
+                            onExplain={handleDashboardExplain}
+                            moisture={moisture} setMoisture={setMoisture}
+                            isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating}
+                            isDraining={isDraining} setIsDraining={setIsDraining}
+                            weather={weather} setWeather={setWeather}
+                            phValue={phValue} setPhValue={setPhValue}
+                            npkValues={npkValues} setNpkValues={setNpkValues}
+                            salinity={salinity} setSalinity={setSalinity}
+                        />
+                    </div>
                 </div>
-            </div>
-            
-            {/* Chat Panel - always visible on lg, toggled on mobile */}
-            <div className={`flex flex-col h-full bg-slate-50 dark:bg-[#1A221E] shadow-2xl transition-all duration-500 ease-in-out flex-grow ${showDashboard ? 'hidden lg:flex' : 'flex'}`}>
-                <header className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700/50 flex-shrink-0">
-                    <div className="flex items-center gap-3">
-                        <LogoIcon className="w-10 h-10" />
-                        <div>
-                            <h1 className="text-lg font-bold text-[#4A5C50] dark:text-slate-100">
-                                Green<span style={{ color: '#D4A22E' }}>Gold</span>
-                            </h1>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">{t('aiAssistant')}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                          onClick={toggleTheme}
-                          className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-600 dark:text-slate-300"
-                          title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-                        >
-                            {theme === 'light' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />}
-                        </button>
-                        <LanguageSwitcher onLanguageChange={handleLanguageChange} />
-                        <button 
-                            onClick={() => setShowDashboard(!showDashboard)}
-                            className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-600 dark:text-slate-300"
-                            title={showDashboard ? t('closeDashboard') : t('openDashboard')}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                            </svg>
-                        </button>
-                    </div>
-                </header>
-
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
-                     {isTranslating && (
-                        <div className="absolute inset-0 bg-slate-50/80 dark:bg-[#1A221E]/80 flex flex-col items-center justify-center z-10">
-                            <Spinner className="w-8 h-8 text-[#D4A22E]" />
-                            <p className="ml-2 mt-2 text-sm font-medium">{t('translatingConversation')}</p>
-                        </div>
-                    )}
-                    {messages.map(msg => (
-                        <div key={msg.id} className={`flex gap-3 animate-slide-in-bottom ${msg.sender === Sender.USER ? 'justify-end' : 'justify-start'}`}>
-                            {msg.sender === Sender.AI && <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4A5C50] to-[#38483E] flex-shrink-0 flex items-center justify-center"><LogoIcon className="w-6 h-6" /></div>}
-                            <div className={`max-w-sm md:max-w-md ${msg.sender === Sender.USER ? 'items-end' : 'items-start'} flex flex-col`}>
-                                <div className={`p-3 rounded-2xl relative ${msg.sender === Sender.USER ? 'bg-[#D4A22E] text-white rounded-br-none' : 'bg-white dark:bg-[#202a25] text-slate-800 dark:text-slate-100 rounded-bl-none'}`}>
-                                    {msg.image && <img src={msg.image} alt="user upload" className="rounded-lg mb-2 max-h-48"/>}
-                                    {msg.content.map((part, index) => {
-                                        if (part.type === 'text') {
-                                            return <div key={index} className="prose prose-sm dark:prose-invert max-w-none markdown-content" dangerouslySetInnerHTML={{ __html: part.value ? parseMarkdown(part.value) : '' }} />;
-                                        }
-                                        if (part.type === 'visualization' && part.data) {
-                                            return part.data.type === 'bar' 
-                                                ? <BarChart key={index} vizData={part.data} />
-                                                : <PieChart key={index} vizData={part.data} />;
-                                        }
-                                        return null;
-                                    })}
-                                     {msg.sender === Sender.AI && msg.content.some(c => c.type === 'text' && c.value) && (
-                                        <TTSButton text={msg.content.filter(c => c.type === 'text').map(c => c.value).join(' ')} />
-                                    )}
-                                </div>
-                                {msg.suggestions && (
-                                    <div className="flex flex-wrap gap-2 mt-2">
-                                        {msg.suggestions.map((sugg: TopicSuggestion, i) => (
-                                            <button key={i} onClick={() => handleSuggestionClick(sugg.prompt)} className="px-3 py-1 text-sm bg-slate-200 dark:bg-slate-700 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">{sugg.title}</button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                             {msg.sender === Sender.USER && <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 flex items-center justify-center"><UserIcon className="w-5 h-5 text-slate-500" /></div>}
-                        </div>
-                    ))}
-                    {isLoading && (
-                        <div className="flex gap-3 justify-start animate-slide-in-bottom">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4A5C50] to-[#38483E] flex-shrink-0 flex items-center justify-center"><LogoIcon className="w-6 h-6" /></div>
-                            <div className="p-3 rounded-2xl bg-white dark:bg-[#202a25] rounded-bl-none flex items-center">
-                                <Spinner className="w-5 h-5 text-[#D4A22E]" />
+                
+                {/* Chat Panel */}
+                <div className={`flex flex-col h-full bg-slate-50 dark:bg-[#1A221E] lg:shadow-2xl transition-all duration-300 ease-in-out flex-grow ${activeView === 'chat' ? 'w-full animate-fade-in-fast' : 'w-0'} lg:flex`}>
+                    <header className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700/50 flex-shrink-0">
+                        <div className="flex items-center gap-3">
+                            <LogoIcon className="w-10 h-10" />
+                            <div>
+                                <h1 className="text-lg font-bold text-[#4A5C50] dark:text-slate-100">
+                                    Green<span style={{ color: '#D4A22E' }}>Gold</span>
+                                </h1>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">{t('aiAssistant')}</p>
                             </div>
                         </div>
-                    )}
-                    {messages.length === 0 && <InitialActions onAction={handleInitialAction} />}
-                    <div ref={chatEndRef}></div>
-                </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                              onClick={toggleTheme}
+                              className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-600 dark:text-slate-300"
+                              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                            >
+                                {theme === 'light' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />}
+                            </button>
+                            <LanguageSwitcher onLanguageChange={handleLanguageChange} />
+                        </div>
+                    </header>
 
-                <div className="p-4 border-t border-slate-200 dark:border-slate-700/50 flex-shrink-0">
-                     {speechError && <p className="text-xs text-red-500 text-center mb-2">{speechError}</p>}
-                    <div className="relative">
-                        {capturedImage && (
-                            <div className="absolute bottom-full left-0 mb-2 p-1 bg-white dark:bg-[#202a25] rounded-lg shadow-md">
-                                <img src={capturedImage} alt="thumbnail" className="h-16 w-16 object-cover rounded" />
-                                <button onClick={() => setCapturedImage(null)} className="absolute -top-2 -right-2 bg-slate-700 text-white rounded-full p-0.5">
-                                    <XMarkIcon className="w-4 h-4" />
-                                </button>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 relative pb-20 lg:pb-4">
+                        {isTranslating && (
+                            <div className="absolute inset-0 bg-slate-50/80 dark:bg-[#1A221E]/80 flex flex-col items-center justify-center z-10">
+                                <Spinner className="w-8 h-8 text-[#D4A22E]" />
+                                <p className="ml-2 mt-2 text-sm font-medium">{t('translatingConversation')}</p>
                             </div>
                         )}
-                        <textarea
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSendMessage(input, capturedImage || undefined);
-                                }
-                            }}
-                            placeholder={t('inputPlaceholder')}
-                            className="w-full p-3 pr-40 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#202a25] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none resize-none"
-                            rows={1}
-                        />
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                             <button
-                                onClick={handleToggleListening}
-                                className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
-                                title={t('speak')}
-                             >
-                                {isListening ? <Spinner className="w-6 h-6 text-red-500" /> : <MicrophoneIcon className="w-6 h-6" />}
-                            </button>
-                             <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
-                                title={t('attachFile')}
-                             >
-                                <UploadIcon className="w-6 h-6" />
-                            </button>
-                             <button
-                                onClick={() => setShowCamera(true)}
-                                className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
-                                title={t('attachImage')}
-                             >
-                                <PhotoIcon className="w-6 h-6" />
-                            </button>
-                            <button
-                                onClick={() => handleSendMessage(input, capturedImage || undefined)}
-                                disabled={isLoading || (!input.trim() && !capturedImage)}
-                                className="p-2 rounded-full bg-[#D4A22E] text-white disabled:bg-slate-400 dark:disabled:bg-slate-600 transition-colors"
-                            >
-                                <PaperAirplaneIcon className="w-6 h-6" />
-                            </button>
+                        {messages.map(msg => (
+                            <div key={msg.id} className={`flex gap-3 animate-slide-in-bottom ${msg.sender === Sender.USER ? 'justify-end' : 'justify-start'}`}>
+                                {msg.sender === Sender.AI && <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4A5C50] to-[#38483E] flex-shrink-0 flex items-center justify-center"><LogoIcon className="w-6 h-6" /></div>}
+                                <div className={`max-w-sm md:max-w-md ${msg.sender === Sender.USER ? 'items-end' : 'items-start'} flex flex-col`}>
+                                    <div className={`p-3 rounded-2xl relative ${msg.sender === Sender.USER ? 'bg-[#D4A22E] text-white rounded-br-none' : 'bg-white dark:bg-[#202a25] text-slate-800 dark:text-slate-100 rounded-bl-none'}`}>
+                                        {msg.image && <img src={msg.image} alt="user upload" className="rounded-lg mb-2 max-h-48"/>}
+                                        {msg.content.map((part, index) => {
+                                            if (part.type === 'text') {
+                                                return <div key={index} className="prose prose-sm dark:prose-invert max-w-none markdown-content" dangerouslySetInnerHTML={{ __html: part.value ? parseMarkdown(part.value) : '' }} />;
+                                            }
+                                            if (part.type === 'visualization' && part.data) {
+                                                return part.data.type === 'bar' 
+                                                    ? <BarChart key={index} vizData={part.data} />
+                                                    : <PieChart key={index} vizData={part.data} />;
+                                            }
+                                            return null;
+                                        })}
+                                        {msg.sender === Sender.AI && msg.content.some(c => c.type === 'text' && c.value) && (
+                                            <TTSButton text={msg.content.filter(c => c.type === 'text').map(c => c.value).join(' ')} />
+                                        )}
+                                    </div>
+                                    {msg.suggestions && (
+                                        <div className="flex flex-wrap gap-2 mt-2">
+                                            {msg.suggestions.map((sugg: TopicSuggestion, i) => (
+                                                <button key={i} onClick={() => handleSuggestionClick(sugg.prompt)} className="px-3 py-1 text-sm bg-slate-200 dark:bg-slate-700 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">{sugg.title}</button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                {msg.sender === Sender.USER && <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 flex items-center justify-center"><UserIcon className="w-5 h-5 text-slate-500" /></div>}
+                            </div>
+                        ))}
+                        {isLoading && (
+                            <div className="flex gap-3 justify-start animate-slide-in-bottom">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4A5C50] to-[#38483E] flex-shrink-0 flex items-center justify-center"><LogoIcon className="w-6 h-6 animate-subtle-pulse" /></div>
+                                <div className="p-3 rounded-2xl bg-white dark:bg-[#202a25] rounded-bl-none flex items-center">
+                                    <Spinner className="w-5 h-5 text-[#D4A22E]" />
+                                </div>
+                            </div>
+                        )}
+                        {messages.length === 0 && <InitialActions onAction={handleInitialAction} />}
+                        <div ref={chatEndRef}></div>
+                    </div>
+
+                    <div className="p-4 border-t border-slate-200 dark:border-slate-700/50 flex-shrink-0">
+                        {speechError && <p className="text-xs text-red-500 text-center mb-2">{speechError}</p>}
+                        <div className="relative">
+                            {capturedImage && (
+                                <div className="absolute bottom-full left-0 mb-2 p-1 bg-white dark:bg-[#202a25] rounded-lg shadow-md">
+                                    <img src={capturedImage} alt="thumbnail" className="h-16 w-16 object-cover rounded" />
+                                    <button onClick={() => setCapturedImage(null)} className="absolute -top-2 -right-2 bg-slate-700 text-white rounded-full p-0.5">
+                                        <XMarkIcon className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
+                            <textarea
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSendMessage(input, capturedImage || undefined);
+                                    }
+                                }}
+                                placeholder={t('inputPlaceholder')}
+                                className="w-full p-3 pr-40 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#202a25] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none resize-none"
+                                rows={1}
+                            />
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                <button
+                                    onClick={handleToggleListening}
+                                    className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+                                    title={t('speak')}
+                                >
+                                    {isListening ? <Spinner className="w-6 h-6 text-red-500" /> : <MicrophoneIcon className="w-6 h-6" />}
+                                </button>
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+                                    title={t('attachFile')}
+                                >
+                                    <UploadIcon className="w-6 h-6" />
+                                </button>
+                                <button
+                                    onClick={() => setShowCamera(true)}
+                                    className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+                                    title={t('attachImage')}
+                                >
+                                    <PhotoIcon className="w-6 h-6" />
+                                </button>
+                                <button
+                                    onClick={() => handleSendMessage(input, capturedImage || undefined)}
+                                    disabled={isLoading || (!input.trim() && !capturedImage)}
+                                    className="p-2 rounded-full bg-[#D4A22E] text-white disabled:bg-slate-400 dark:disabled:bg-slate-600 transition-colors"
+                                >
+                                    <PaperAirplaneIcon className="w-6 h-6" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                 <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    accept="image/*"
-                />
-                {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}
-            </div>
+            </main>
+
+            {/* Mobile Bottom Navigation */}
+            <BottomNavBar 
+                activeView={activeView}
+                setActiveView={setActiveView}
+                onSettingsClick={() => setShowSettings(true)}
+                onLogsClick={() => setShowLogs(true)}
+            />
+            
+            {/* Modals */}
+            {showSettings && <ModalPlaceholder title={t('settings')} onClose={() => setShowSettings(false)} />}
+            {showLogs && <ModalPlaceholder title={t('logs')} onClose={() => setShowLogs(false)} />}
+
+            {/* Other Overlays */}
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                className="hidden"
+                accept="image/*"
+            />
+            {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}
         </div>
     );
 };

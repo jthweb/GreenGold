@@ -125,5 +125,10 @@
   "speak": "बोलें",
   "speechError": "वाक् पहचान विफल रही। कृपया पुनः प्रयास करें।",
   "language": "भाषा",
-  "translatingConversation": "बातचीत का अनुवाद हो रहा है..."
+  "translatingConversation": "बातचीत का अनुवाद हो रहा है...",
+  "home": "होम",
+  "chat": "चैट",
+  "settings": "सेटिंग्स",
+  "logs": "लॉग",
+  "comingSoon": "जल्द आ रहा है..."
 }

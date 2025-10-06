@@ -120,5 +120,10 @@
   "speak": "Falar",
   "speechError": "Falha no reconhecimento de voz. Por favor, tente novamente.",
   "language": "Idioma",
-  "translatingConversation": "Traduzindo conversa..."
+  "translatingConversation": "Traduzindo conversa...",
+  "home": "Início",
+  "chat": "Chat",
+  "settings": "Configurações",
+  "logs": "Registros",
+  "comingSoon": "em breve..."
 }

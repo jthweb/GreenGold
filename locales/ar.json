@@ -125,5 +125,10 @@
   "speak": "تحدث",
   "speechError": "فشل التعرف على الكلام. يرجى المحاولة مرة أخرى.",
   "language": "اللغة",
-  "translatingConversation": "جارٍ ترجمة المحادثة..."
+  "translatingConversation": "جارٍ ترجمة المحادثة...",
+  "home": "الرئيسية",
+  "chat": "الدردشة",
+  "settings": "الإعدادات",
+  "logs": "السجلات",
+  "comingSoon": "قريبا..."
 }
