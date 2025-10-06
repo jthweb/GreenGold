@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created `CONTRIBUTING.md` with guidelines for new contributors.
 - Created `CHANGELOG.md` to track project changes.
 - Created `SECURITY.md` with a vulnerability reporting policy.
-- Added a "Made by JThweb" watermark to the chat interface.
 - Created a static `assets/logo.svg` file for the application icon and logo.
 
 ### Changed
