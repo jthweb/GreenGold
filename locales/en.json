@@ -158,5 +158,6 @@
   "saveLog": "Save Log",
   "newLogSaved": "New log entry saved.",
   "notes": "Notes",
-  "notesPlaceholder": "Add any observations..."
+  "notesPlaceholder": "Add any observations...",
+  "cancel": "Cancel"
 }
