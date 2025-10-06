@@ -1,7 +1,5 @@
-
 // FIX: This file was created to provide a time of day and greeting widget.
 import React, { useState, useEffect } from 'react';
-// FIX: Adjusted import paths for components and hooks to work from the root directory.
 import { SunIcon, MoonIcon, LeafIcon } from './components/Icons';
 import { useLocalization } from './hooks/useLocalization';
 

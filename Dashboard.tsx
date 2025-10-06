@@ -1,24 +1,21 @@
-
-
 // FIX: This file was created to display the main dashboard grid.
 import React from 'react';
-// FIX: Adjusted import paths to point to the components directory.
 import WidgetWrapper from './components/WidgetWrapper';
-import WeatherWidget from './WeatherWidget';
+import WeatherWidget from './components/WeatherWidget';
 import SoilMoistureWidget from './components/SoilMoistureWidget';
 import CropDistributionWidget from './components/CropDistributionWidget';
 import MarketAnalysisWidget from './components/MarketAnalysisWidget';
 import AlertsWidget from './components/AlertsWidget';
-import RecommendationsWidget from './RecommendationsWidget';
+import RecommendationsWidget from './components/RecommendationsWidget';
 import ImpactWidget from './components/ImpactWidget';
 import SalinityWidget from './components/SalinityWidget';
 import PHWidget from './components/PHWidget';
 import NPKWidget from './components/NPKWidget';
-// FIX: Adjusted import paths for types and hooks to work from the root directory.
 import { WeatherCondition, NPKValues } from './types';
-import TimeOfDayWidget from './TimeOfDayWidget';
+import TimeOfDayWidget from './components/TimeOfDayWidget';
 import IrrigationAdvisorWidget from './components/IrrigationAdvisorWidget';
 import { useLocalization } from './hooks/useLocalization';
+import ActionsWidget from './components/ActionsWidget';
 
 interface DashboardProps {
     onExplain: (prompt: string) => void;
@@ -34,14 +31,12 @@ interface DashboardProps {
     setPhValue: React.Dispatch<React.SetStateAction<number>>;
     npkValues: NPKValues;
     setNpkValues: React.Dispatch<React.SetStateAction<NPKValues>>;
-    // FIX: Added missing salinity props to the interface.
     salinity: number;
     setSalinity: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
     const { t } = useLocalization();
-    // FIX: Destructured the new salinity props.
     const { onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues, salinity, setSalinity } = props;
 
     // Effect for rain simulation
@@ -67,18 +62,14 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
     // Effect for draining excess water
     React.useEffect(() => {
         let drainInterval: number | null = null;
-        if (moisture >= 110 && !isDraining) {
-            setIsDraining(true);
-        }
-
         if (isDraining) {
             drainInterval = window.setInterval(() => {
                 setMoisture(prev => {
                     const newMoisture = prev - 0.25;
-                    if (newMoisture <= 100) {
+                    if (newMoisture <= 95) { // Drain to a slightly lower threshold
                         if (drainInterval) clearInterval(drainInterval);
                         setIsDraining(false);
-                        return 100;
+                        return 95;
                     }
                     return newMoisture;
                 });
@@ -87,51 +78,90 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
         return () => {
             if (drainInterval) clearInterval(drainInterval);
         };
-    }, [moisture, isDraining, setIsDraining, setMoisture]);
+    }, [isDraining, setIsDraining, setMoisture]);
+
+     // Effect for evaporation/water usage simulation
+    React.useEffect(() => {
+        const evaporationInterval = setInterval(() => {
+            if (isIrrigating || isDraining || weather === 'rainy') return;
+
+            let rate = 0.05; // Base rate
+            if (weather === 'sunny') rate = 0.1;
+            if (weather === 'cloudy') rate = 0.05;
+
+            setMoisture(prev => Math.max(0, prev - rate));
+
+        }, 3000); // every 3 seconds
+
+        return () => clearInterval(evaporationInterval);
+    }, [isIrrigating, isDraining, weather, setMoisture]);
     
     return (
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-100 dark:bg-[#141615]">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-100 dark:bg-[#141615] pb-20 lg:pb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-min gap-6">
                 
-                {/* Column 1 */}
-                <div className="space-y-6">
+                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '100ms'}}>
                     <WidgetWrapper title={t('farmerName')} explanation={t('timeOfDayExplain')} explanationPrompt={t('timeOfDayExplainPrompt')} onExplain={onExplain}><TimeOfDayWidget /></WidgetWrapper>
-                    <WidgetWrapper title={t('weather')} explanation={t('weatherExplain')} explanationPrompt={t('weatherExplainPrompt')} onExplain={onExplain}><WeatherWidget weather={weather} setWeather={setWeather} /></WidgetWrapper>
-                    <WidgetWrapper title={t('alerts')} explanation={t('alertsExplain')} explanationPrompt={t('alertsExplainPrompt')} onExplain={onExplain}><AlertsWidget /></WidgetWrapper>
                 </div>
 
-                {/* Column 2 */}
-                <div className="space-y-6">
-                   <WidgetWrapper title={t('soilMoisture')} explanation={t('soilMoistureExplain')} explanationPrompt={t('soilMoistureExplainPrompt')} onExplain={onExplain}>
+                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms'}}>
+                     <WidgetWrapper title={t('weather')} explanation={t('weatherExplain')} explanationPrompt={t('weatherExplainPrompt')} onExplain={onExplain}><WeatherWidget weather={weather} setWeather={setWeather} /></WidgetWrapper>
+                </div>
+                
+                <div className="lg:col-span-2 lg:row-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '300ms'}}>
+                    <IrrigationAdvisorWidget onExplain={onExplain} isIrrigating={isIrrigating} moisture={moisture} weather={weather} phValue={phValue} />
+                </div>
+
+                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '400ms'}}>
+                     <WidgetWrapper title={t('soilMoisture')} explanation={t('soilMoistureExplain')} explanationPrompt={t('soilMoistureExplainPrompt')} onExplain={onExplain}>
                         <SoilMoistureWidget 
                             moisture={moisture} 
                             isIrrigating={isIrrigating} 
                             isDraining={isDraining}
                             setMoisture={setMoisture} 
                             setIsIrrigating={setIsIrrigating} 
-                            // FIX: Passed the required setIsDraining prop.
                             setIsDraining={setIsDraining}
                             weather={weather} 
                         />
                    </WidgetWrapper>
-                   {/* FIX: Passed the required salinity props to SalinityWidget. */}
-                   <WidgetWrapper title={t('salinityEC')} explanation={t('salinityExplain')} explanationPrompt={t('salinityExplainPrompt')} onExplain={onExplain}><SalinityWidget salinity={salinity} setSalinity={setSalinity} /></WidgetWrapper>
-                   <WidgetWrapper title={t('soilPH')} explanation={t('phExplain')} explanationPrompt={t('phExplainPrompt')} onExplain={onExplain}><PHWidget phValue={phValue} setPhValue={setPhValue} /></WidgetWrapper>
                 </div>
 
-                {/* Column 3 */}
-                <div className="space-y-6">
-                    <WidgetWrapper title={t('topRecommendations')} explanation={t('recommendationsExplain')} explanationPrompt={t('recommendationsExplainPrompt')} onExplain={onExplain}><RecommendationsWidget /></WidgetWrapper>
+                 <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '500ms'}}>
                     <WidgetWrapper title={t('npkLevels')} explanation={t('npkExplain')} explanationPrompt={t('npkExplainPrompt')} onExplain={onExplain}><NPKWidget npkValues={npkValues} setNpkValues={setNpkValues} /></WidgetWrapper>
-                    <WidgetWrapper title={t('yourImpact')} explanation={t('impactExplain')} explanationPrompt={t('impactExplainPrompt')} onExplain={onExplain}><ImpactWidget /></WidgetWrapper>
+                </div>
+
+                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '600ms'}}>
+                    <WidgetWrapper title={t('topRecommendations')} explanation={t('recommendationsExplain')} explanationPrompt={t('recommendationsExplainPrompt')} onExplain={onExplain}><RecommendationsWidget /></WidgetWrapper>
+                </div>
+
+                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '700ms'}}>
+                     <WidgetWrapper title={t('alerts')} explanation={t('alertsExplain')} explanationPrompt={t('alertsExplainPrompt')} onExplain={onExplain}><AlertsWidget /></WidgetWrapper>
+                </div>
+
+                <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '800ms'}}>
+                    <WidgetWrapper title={t('soilPH')} explanation={t('phExplain')} explanationPrompt={t('phExplainPrompt')} onExplain={onExplain}><PHWidget phValue={phValue} setPhValue={setPhValue} /></WidgetWrapper>
                 </div>
                 
-                {/* Column 4 */}
-                <div className="space-y-6">
-                    {/* FIX: Passed the required phValue prop. */}
-                    <IrrigationAdvisorWidget onExplain={onExplain} isIrrigating={isIrrigating} moisture={moisture} weather={weather} phValue={phValue} />
-                    <WidgetWrapper title={t('cropDistribution')} explanation={t('cropDistributionExplain')} explanationPrompt={t('cropDistributionExplainPrompt')} onExplain={onExplain}><CropDistributionWidget /></WidgetWrapper>
+                <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '900ms'}}>
+                    <WidgetWrapper title={t('salinityEC')} explanation={t('salinityExplain')} explanationPrompt={t('salinityExplainPrompt')} onExplain={onExplain}><SalinityWidget salinity={salinity} setSalinity={setSalinity} /></WidgetWrapper>
+                </div>
+                
+                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '1000ms'}}>
                     <WidgetWrapper title={t('marketAnalysis')} explanation={t('marketAnalysisExplain')} explanationPrompt={t('marketAnalysisExplainPrompt')} onExplain={onExplain}><MarketAnalysisWidget /></WidgetWrapper>
+                </div>
+
+                <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '1100ms'}}>
+                    <WidgetWrapper title={t('cropDistribution')} explanation={t('cropDistributionExplain')} explanationPrompt={t('cropDistributionExplainPrompt')} onExplain={onExplain}><CropDistributionWidget /></WidgetWrapper>
+                </div>
+
+                <div className="opacity-0 animate-slide-in-up" style={{ animationDelay: '1200ms'}}>
+                    <WidgetWrapper title={t('yourImpact')} explanation={t('impactExplain')} explanationPrompt={t('impactExplainPrompt')} onExplain={onExplain}><ImpactWidget /></WidgetWrapper>
+                </div>
+
+                <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '1300ms'}}>
+                    <WidgetWrapper title={t('quickActions')} explanation={t('actionsExplain')} explanationPrompt={t('actionsExplainPrompt')} onExplain={onExplain}>
+                        <ActionsWidget onExplain={onExplain} />
+                    </WidgetWrapper>
                 </div>
             </div>
         </div>

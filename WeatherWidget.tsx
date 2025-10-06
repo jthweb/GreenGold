@@ -1,7 +1,5 @@
-
 // FIX: This file was created to provide a weather display widget.
 import React from 'react';
-// FIX: Adjusted import paths for components, hooks, and types to work from the root directory.
 import { SunIcon, CloudIcon, CloudRainIcon } from './components/Icons';
 import { useLocalization } from './hooks/useLocalization';
 import { WeatherCondition } from './types';
