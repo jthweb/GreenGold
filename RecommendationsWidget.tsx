@@ -8,7 +8,7 @@ const RecommendationsWidget: React.FC = () => {
     const { t } = useLocalization();
 
     const recommendations = [
-        t('recUrea'),
+        t('recFertigate'),
         t('recPests'),
         t('recIrrigate')
     ];

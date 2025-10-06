@@ -1,4 +1,3 @@
-
 {
   "welcomeTo": "欢迎来到",
   "selectLanguage": "请选择您的首选语言以开始。",
@@ -142,7 +141,6 @@
   "farmName": "农场名称",
   "farmNamePlaceholder": "例如，阳光草地农场",
   "farmSize": "农场规模（公顷）",
-
   "farmCrops": "主要作物",
   "farmCropsPlaceholder": "例如，小麦、大麦、油菜籽",
   "finishSetup": "完成设置",

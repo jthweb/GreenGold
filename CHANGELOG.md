@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.0] - 2024-08-01
+## [1.5.0] - 2025-10-06
 
 ### Added
 - **User Authentication**: Implemented a full login/sign-up flow with persistent sessions using local storage.
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Widget Logic**: Updated the "Drain Water" button to be enabled whenever moisture is above 30%. Updated the "Start Irrigation" button to allow irrigation up to 110% moisture.
 - **README**: Removed the outdated mention of the hackathon event.
 
-## [1.4.0] - 2024-07-31
+## [1.4.0] - 2025-10-06
 
 ### Added
 - **Mobile Navigation**: Implemented a dedicated bottom navigation bar for mobile views, featuring animated transitions for a more app-like experience.
@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Responsive Layout**: Reworked the application layout to completely hide the dashboard widgets when the chat view is active on mobile, providing a focused, full-screen experience.
 
-## [1.3.0] - 2024-07-30
+## [1.3.0] - 2025-10-05
 
 ### Added
 - **Dynamic UI**: Added animations for widget loading, chat message appearance, and interactive element hovers to make the interface more lively.
@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Language Switcher**: The language selector in the chat header is now a scrollable dropdown menu to accommodate all languages.
 - **Irrigation Advisor**: The advisor widget now populates with dynamic, real-time data from the dashboard.
 
-## [1.2.0] - 2024-07-30
+## [1.2.0] - 2025-10-05
 
 ### Added
 - **Speech-to-Text**: Integrated the browser's Speech Recognition API for hands-free voice input in the chat.
@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Significantly updated `README.md` with accurate local deployment instructions, a detailed feature list, and updated AI model information. Re-ordered the language list.
 - **Security**: Updated the contact email in `SECURITY.md`.
 
-## [1.1.1] - 2024-07-29
+## [1.1.1] - 2025-10-04
 
 ### Added
 - **Theme Toggle**: Implemented a manual light/dark mode theme switcher.
@@ -68,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **AI Context**: Updated the default AI context and dashboard widgets to be specific to UK agriculture (e.g., Barley, Rapeseed) for a more focused demo.
 - **Documentation**: Added sections on dashboard features and future plans to `README.md`.
 
-## [1.1.0] - 2024-07-29
+## [1.1.0] - 2025-10-04
 
 ### Added
 - **Language Expansion**: Added support for 5 new languages: German, Italian, Russian, Japanese, and Korean.
@@ -79,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README**: Rewrote the README to have a more human, community-focused tone.
 - **Assets**: The app now uses the static SVG file for its logo and favicon.
 
-## [1.0.0] - 2024-05-18
+## [1.0.0] - 2025-10-03
 
 ### Added
 - Initial release of the GreenGold application.
