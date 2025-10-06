@@ -1,5 +1,5 @@
 import React from 'react';
-import { HomeIcon, MicrophoneIcon, Cog6ToothIcon, DocumentTextIcon } from './Icons'; // Assuming chat uses Microphone icon or similar
+import { HomeIcon, ChatIcon, SettingsIcon, LogIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
 type ActiveView = 'dashboard' | 'chat';
@@ -19,10 +19,13 @@ const NavButton: React.FC<{
 }> = ({ label, icon: Icon, isActive, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center justify-center gap-1 w-full pt-2 pb-1 transition-all duration-300 transform ${isActive ? 'text-[#D4A22E] scale-110' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
+        className={`flex flex-col items-center justify-center gap-1 w-full pt-2 pb-1 transition-all duration-300 ease-out transform ${isActive ? ' text-[#D4A22E]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
     >
-        <Icon className="w-6 h-6" />
-        <span className={`text-xs font-semibold ${isActive ? 'opacity-100' : 'opacity-0'}`}>{label}</span>
+        <div className={`relative transition-all duration-300 ease-out ${isActive ? '-translate-y-2' : 'translate-y-0'}`}>
+            <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-[#D4A22E] rounded-full transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`}></div>
+            <Icon className="w-6 h-6" />
+        </div>
+        <span className={`text-xs font-semibold transition-all duration-200 ${isActive ? 'opacity-100' : 'opacity-0 -translate-y-1'}`}>{label}</span>
     </button>
 );
 
@@ -41,19 +44,19 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, setActiveView, 
                 />
                  <NavButton
                     label={t('chat')}
-                    icon={MicrophoneIcon}
+                    icon={ChatIcon}
                     isActive={activeView === 'chat'}
                     onClick={() => setActiveView('chat')}
                 />
                  <NavButton
                     label={t('logs')}
-                    icon={DocumentTextIcon}
+                    icon={LogIcon}
                     isActive={false} // This is a modal trigger, not a view
                     onClick={onLogsClick}
                 />
                  <NavButton
                     label={t('settings')}
-                    icon={Cog6ToothIcon}
+                    icon={SettingsIcon}
                     isActive={false} // This is a modal trigger, not a view
                     onClick={onSettingsClick}
                 />

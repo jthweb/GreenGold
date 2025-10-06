@@ -13,7 +13,7 @@ interface WidgetWrapperProps {
 const WidgetWrapper: React.FC<WidgetWrapperProps> = ({ title, children, explanation, explanationPrompt, onExplain }) => {
     const { t } = useLocalization();
     return (
-        <div className="bg-white dark:bg-[#202a25] rounded-xl shadow-sm h-full flex flex-col">
+        <div className="bg-white dark:bg-[#202a25] rounded-xl shadow-sm h-full flex flex-col transition-transform duration-300 lg:hover:scale-[1.02]">
             <div className="p-4 border-b border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300">{title}</h3>
                 <div className="relative group">

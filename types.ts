@@ -41,3 +41,14 @@ export interface NPKValues {
     p: number;
     k: number;
 }
+
+export interface FarmDetails {
+    farmName: string;
+    farmSize: number;
+    primaryCrops: string;
+}
+
+export interface User extends FarmDetails {
+    email: string;
+    password?: string; // Optional for security reasons when handling user objects
+}

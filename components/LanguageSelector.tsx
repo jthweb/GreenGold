@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocalization } from '../hooks/useLocalization';
 import { LogoIcon } from './Icons';
@@ -17,7 +16,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageSelect })
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-100 dark:bg-[#141615] flex flex-col items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-slate-100 dark:bg-[#141615] flex flex-col items-center justify-center z-50 p-4 overflow-y-auto animate-fade-in">
       <div className="text-center w-full max-w-2xl mx-auto py-8">
         <LogoIcon className="w-24 h-24 mx-auto mb-6 opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }} />
         <h1 className="text-3xl font-bold tracking-tight text-[#4A5C50] dark:text-slate-200 mb-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms' }}>

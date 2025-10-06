@@ -61,12 +61,6 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
 
     // Effect for draining excess water
     React.useEffect(() => {
-        if (moisture >= 110 && !isDraining) {
-            setIsDraining(true);
-        }
-    }, [moisture, isDraining, setIsDraining]);
-
-    React.useEffect(() => {
         let drainInterval: number | null = null;
         if (isDraining) {
             drainInterval = window.setInterval(() => {
@@ -103,7 +97,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
     }, [isIrrigating, isDraining, weather, setMoisture]);
     
     return (
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-100 dark:bg-[#141615]">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-100 dark:bg-[#141615] pb-20 lg:pb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-min gap-6">
                 
                 <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '100ms'}}>

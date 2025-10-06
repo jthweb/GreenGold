@@ -4,9 +4,7 @@
 <h1 align="center">GreenGold - Your AI Farming Assistant</h1>
 
 <p align="center">
-  <em>Winner of the "Reboot the Earth" Hackathon in Doha, hosted at Carnegie Mellon University in Qatar.</em>
-  <br>
-  <strong>See you at Hackathon 2025 (Oct 2-4, 2025)!</strong>
+  <em>Originally conceived at the "Reboot the Earth" Hackathon in Doha, hosted at Carnegie Mellon University in Qatar.</em>
 </p>
 
 <p align="center">
@@ -25,12 +23,12 @@ This isn't just an app; it's a partner for your farm. It combines a real-time da
 
 ## Key Features
 
+-   **User Accounts & Personalized Farms**: Sign up and save your unique farm details—size, crops, and conditions—for a truly tailored AI experience.
 -   **Interactive AI Chat**: Have a conversation with an AI that understands your farm's live data. Ask questions, get advice, and receive clear, actionable steps.
 -   **Voice-to-Text Input**: Speak your questions directly to the AI in your selected language.
 -   **Visual Plant Health Analysis**: Snap a photo of a plant or upload an image file, and our AI will analyze its health, identify potential issues, and suggest solutions.
 -   **All-in-One Farm Dashboard**: See everything at a glance with our comprehensive suite of widgets.
 -   **Multi-Language Support**: The interface and AI responses are available in over a dozen languages to support farmers globally.
--   **Clear Data Visuals**: We turn complex data into simple charts and graphs, so you always know what's happening on your farm.
 -   **Language-Aware Text-to-Speech**: Listen to the AI's advice in the selected language, perfect for when you're busy in the field.
 -   **Light & Dark Modes**: Choose the theme that works best for your environment.
 

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChatMessage, NPKValues, Sender, TopicSuggestion, WeatherCondition, MessageContent } from './types';
+import { ChatMessage, NPKValues, Sender, TopicSuggestion, WeatherCondition, MessageContent, FarmDetails } from './types';
 import { getGeminiResponse, translateTexts } from './services/geminiService';
 import { getRuleBasedResponse } from './services/ruleBasedService';
 import { useLocalization } from './hooks/useLocalization';
+import { useUser } from './hooks/useUser';
 
 import LanguageSelector from './components/LanguageSelector';
-// FIX: The root Dashboard.tsx component is now used, as it's the one with the reported error.
+import LoginScreen from './components/LoginScreen';
+import OnboardingScreen from './components/OnboardingScreen';
 import Dashboard from './components/Dashboard';
 import BarChart from './components/BarChart';
 import PieChart from './components/PieChart';
@@ -15,9 +17,11 @@ import InitialActions from './components/InitialActions';
 import TTSButton from './components/TTSButton';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import BottomNavBar from './components/BottomNavBar';
+import Header from './components/Header';
+import LogModal from './components/LogModal';
 import { marked } from 'marked';
 
-import { LogoIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, SunIcon, MoonIcon, UploadIcon, MicrophoneIcon } from './components/Icons';
+import { AIAgentIcon, UserIcon, PaperAirplaneIcon, PhotoIcon, XMarkIcon, UploadIcon, MicrophoneIcon } from './components/Icons';
 
 // FIX: Add type definitions for the browser's Speech Recognition API to resolve TypeScript errors.
 interface SpeechRecognitionEvent extends Event {
@@ -69,9 +73,9 @@ declare global {
 }
 
 type MobileView = 'dashboard' | 'chat';
+type AppState = 'LANGUAGE_SELECT' | 'AUTH' | 'ONBOARDING' | 'MAIN_APP';
 
 const ModalPlaceholder: React.FC<{ title: string; onClose: () => void }> = ({ title, onClose }) => {
-    // FIX: Call the `useLocalization` hook to get the translation function `t`.
     const { t } = useLocalization();
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in-fast" onClick={onClose}>
@@ -85,9 +89,14 @@ const ModalPlaceholder: React.FC<{ title: string; onClose: () => void }> = ({ ti
 
 
 const App: React.FC = () => {
-    // State variables
+    // Context and State Hooks
     const { t, language, setLanguage } = useLocalization();
-    const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
+    const { user, login, logout, needsOnboarding, completeOnboarding } = useUser();
+    
+    // App Flow State
+    const [appState, setAppState] = useState<AppState>('LANGUAGE_SELECT');
+
+    // UI State
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -101,8 +110,7 @@ const App: React.FC = () => {
     const [showSettings, setShowSettings] = useState(false);
     const [showLogs, setShowLogs] = useState(false);
 
-
-    // Dashboard state
+    // Dashboard state - This will be loaded from user's saved state
     const [moisture, setMoisture] = useState(75);
     const [isIrrigating, setIsIrrigating] = useState(false);
     const [isDraining, setIsDraining] = useState(false);
@@ -113,7 +121,6 @@ const App: React.FC = () => {
 
     // Image capture and upload state
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
-    // FIX: Define the 'showCamera' state variable that was missing.
     const [showCamera, setShowCamera] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +128,19 @@ const App: React.FC = () => {
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
     const [speechError, setSpeechError] = useState<string | null>(null);
+    
+    // Determine app state based on user status
+    useEffect(() => {
+        if (appState === 'LANGUAGE_SELECT') return; // Wait for language selection
+        if (!user) {
+            setAppState('AUTH');
+        } else if (needsOnboarding) {
+            setAppState('ONBOARDING');
+        } else {
+            setAppState('MAIN_APP');
+            // TODO: Load user's saved farm state from localStorage here
+        }
+    }, [user, needsOnboarding, appState]);
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -145,6 +165,7 @@ const App: React.FC = () => {
 
     const handleSendMessage = useCallback(async (prompt: string, image?: string) => {
         if (!prompt && !image) return;
+        if (!user) return; // Should not happen if UI is correct
 
         const userMessage: ChatMessage = {
             id: Date.now().toString(),
@@ -157,12 +178,10 @@ const App: React.FC = () => {
         setCapturedImage(null);
         setIsLoading(true);
         
-        // On mobile, switch to chat view when a message is sent
         if (window.innerWidth < 1024) {
             setActiveView('chat');
         }
 
-        // First, check rule-based service for a direct match
         const ruleResponse = getRuleBasedResponse(prompt, language);
         if (ruleResponse) {
              const enrichedResponse: ChatMessage = {
@@ -172,11 +191,10 @@ const App: React.FC = () => {
             setTimeout(() => {
                 setMessages(prev => [...prev, enrichedResponse]);
                 setIsLoading(false);
-            }, 500); // 0.5s delay for a more natural feel
+            }, 500);
             return;
         }
 
-        // If no match, construct context and call Gemini
         const phStatus = phValue < 6.5 ? t('acidic') : phValue > 7.0 ? t('alkaline') : t('ideal');
         const weatherData = {
             sunny: { text: t('sunny'), temp: '18°C', humidity: '65%', wind: '15 km/h' },
@@ -188,8 +206,8 @@ const App: React.FC = () => {
         const farmContext = `
 ---
 CURRENT FARM DATA (This is a pre-prompt with live data):
-- Farm Profile: 50 Hectare farm in the United Kingdom.
-- Primary Crops: Wheat, Barley, Rapeseed.
+- Farm Profile: ${user.farmSize} Hectare farm named "${user.farmName}".
+- Primary Crops: ${user.primaryCrops}.
 - Weather: ${currentWeatherData.text}, ${currentWeatherData.temp}, ${currentWeatherData.humidity} Humidity, ${currentWeatherData.wind} Wind
 - Soil Moisture: ${Math.round(moisture)}%
 - Soil pH: ${phValue.toFixed(1)} (${phStatus})
@@ -214,71 +232,34 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
         } finally {
             setIsLoading(false);
         }
-    }, [language, t, moisture, weather, phValue, npkValues, salinity, isIrrigating]);
+    }, [language, t, moisture, weather, phValue, npkValues, salinity, isIrrigating, user]);
     
-    // Setup Speech Recognition
     useEffect(() => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            console.warn("Speech recognition not supported in this browser.");
-            return;
-        }
+        if (!SpeechRecognition) return;
 
         const recognition: SpeechRecognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = language;
-
-        recognition.onstart = () => {
-            setIsListening(true);
-            setSpeechError(null);
-        };
-
-        recognition.onend = () => {
-            setIsListening(false);
-        };
-
-        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-            console.error('Speech recognition error', event.error);
-            setSpeechError(t('speechError'));
-            setIsListening(false);
-        };
-
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-            const transcript = event.results[0][0].transcript;
-            handleSendMessage(transcript);
-        };
-        
+        recognition.onstart = () => { setIsListening(true); setSpeechError(null); };
+        recognition.onend = () => setIsListening(false);
+        recognition.onerror = (event: SpeechRecognitionErrorEvent) => { setSpeechError(t('speechError')); setIsListening(false); };
+        recognition.onresult = (event: SpeechRecognitionEvent) => handleSendMessage(event.results[0][0].transcript);
         recognitionRef.current = recognition;
     }, [language, handleSendMessage, t]);
 
     const handleToggleListening = () => {
-        if (isListening) {
-            recognitionRef.current?.stop();
-        } else {
-            recognitionRef.current?.start();
-        }
-    };
-
-
-    const handleLanguageChange = async (langCode: string) => {
-        if (langCode === language) return;
-        setLanguage(langCode);
+        if (isListening) recognitionRef.current?.stop();
+        else recognitionRef.current?.start();
     };
 
     useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-        if (messages.length === 0) return;
-
-        const translateConversation = async () => {
+        if (isInitialMount.current || messages.length === 0) { isInitialMount.current = false; return; }
+        (async () => {
             setIsTranslating(true);
-            
             const textsToTranslate: string[] = [];
             const translationMap: { msgIndex: number, type: 'content' | 'suggestion', contentIndex: number, field: 'value' | 'title' | 'prompt' }[] = [];
-
             messages.forEach((msg, msgIndex) => {
                 msg.content.forEach((content, contentIndex) => {
                     if (content.type === 'text' && content.originalValue) {
@@ -293,117 +274,76 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                     translationMap.push({ msgIndex, type: 'suggestion', contentIndex: suggestionIndex, field: 'prompt' });
                 });
             });
-
             const translatedTexts = await translateTexts(textsToTranslate, language);
-            
-            const newMessages = JSON.parse(JSON.stringify(messages)); // Deep copy
-
+            const newMessages = JSON.parse(JSON.stringify(messages));
             let textIndex = 0;
             translationMap.forEach(mapInfo => {
                 const { msgIndex, type, contentIndex, field } = mapInfo;
-                if (type === 'content') {
-                    newMessages[msgIndex].content[contentIndex].value = translatedTexts[textIndex];
-                } else if (type === 'suggestion') {
+                if (type === 'content') newMessages[msgIndex].content[contentIndex].value = translatedTexts[textIndex];
+                else if (type === 'suggestion') {
                     if(field === 'title') newMessages[msgIndex].suggestions[contentIndex].title = translatedTexts[textIndex];
                     if(field === 'prompt') newMessages[msgIndex].suggestions[contentIndex].prompt = translatedTexts[textIndex];
                 }
                 textIndex++;
             });
-            
             setMessages(newMessages);
             setIsTranslating(false);
-        };
-
-        translateConversation();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        })();
     }, [language]);
 
-
-    const handleSuggestionClick = (prompt: string) => {
-        handleSendMessage(prompt);
-    };
-
-    const handleInitialAction = (prompt: string) => {
-        setInput(prompt);
-        handleSendMessage(prompt);
-    };
-
+    const handleSuggestionClick = (prompt: string) => handleSendMessage(prompt);
+    const handleInitialAction = (prompt: string) => handleSendMessage(prompt);
     const handleImageCapture = (imageDataUrl: string) => {
-        setCapturedImage(imageDataUrl);
-        setShowCamera(false);
+        setCapturedImage(imageDataUrl); setShowCamera(false);
         handleSendMessage(t('analyzeImagePrompt'), imageDataUrl);
     };
-
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageDataUrl = e.target?.result as string;
-                handleImageCapture(imageDataUrl); // Use the same flow as camera capture
-            };
+            reader.onload = (e) => handleImageCapture(e.target?.result as string);
             reader.readAsDataURL(file);
         }
-        // Reset file input to allow selecting the same file again
         if(event.target) event.target.value = '';
     };
+    const handleDashboardExplain = (prompt: string) => handleSendMessage(prompt);
+    const parseMarkdown = (text: string) => marked.parse(text, { breaks: true });
 
-    const handleDashboardExplain = (prompt: string) => {
-        handleSendMessage(prompt);
-    };
-    
-    const parseMarkdown = (text: string) => {
-        // Configure marked to handle lists and bold text as requested by geminiService prompt
-        return marked.parse(text, { breaks: true });
-    };
-
-    if (!hasSelectedLanguage) {
-        return <LanguageSelector onLanguageSelect={() => setHasSelectedLanguage(true)} />;
-    }
+    // Render based on app state
+    if (appState === 'LANGUAGE_SELECT') return <LanguageSelector onLanguageSelect={() => setAppState('AUTH')} />;
+    if (appState === 'AUTH') return <LoginScreen />;
+    if (appState === 'ONBOARDING' && user) return <OnboardingScreen user={user} onComplete={completeOnboarding} />;
 
     return (
         <div className="h-screen bg-white dark:bg-[#1A221E] text-slate-800 dark:text-slate-200 font-sans flex flex-col lg:flex-row overflow-hidden">
-             {/* Main content area */}
-            <main className="flex-1 flex lg:flex-row overflow-hidden">
+             <Header onToggleTheme={toggleTheme} theme={theme} onLogout={logout} />
+            <main className="flex-1 flex lg:flex-row overflow-hidden pt-16 lg:pt-0">
                 {/* Dashboard Panel */}
-                <div className={`h-full flex-shrink-0 transition-all duration-300 ease-in-out ${activeView === 'dashboard' ? 'w-full animate-fade-in-fast' : 'w-0'} lg:w-3/5 xl:w-2/3 lg:flex flex-col`}>
-                    <div className={`${activeView === 'dashboard' ? 'flex' : 'hidden'} lg:flex flex-col h-full`}>
-                        <Dashboard 
-                            onExplain={handleDashboardExplain}
-                            moisture={moisture} setMoisture={setMoisture}
-                            isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating}
-                            isDraining={isDraining} setIsDraining={setIsDraining}
-                            weather={weather} setWeather={setWeather}
-                            phValue={phValue} setPhValue={setPhValue}
-                            npkValues={npkValues} setNpkValues={setNpkValues}
-                            salinity={salinity} setSalinity={setSalinity}
-                        />
-                    </div>
+                <div className={`h-full flex-shrink-0 transition-all duration-300 ease-in-out ${activeView === 'dashboard' ? 'w-full animate-fade-in-fast' : 'w-0 hidden'} lg:w-3/5 xl:w-2/3 lg:flex flex-col`}>
+                    <Dashboard 
+                        onExplain={handleDashboardExplain}
+                        moisture={moisture} setMoisture={setMoisture}
+                        isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating}
+                        isDraining={isDraining} setIsDraining={setIsDraining}
+                        weather={weather} setWeather={setWeather}
+                        phValue={phValue} setPhValue={setPhValue}
+                        npkValues={npkValues} setNpkValues={setNpkValues}
+                        salinity={salinity} setSalinity={setSalinity}
+                    />
                 </div>
                 
                 {/* Chat Panel */}
-                <div className={`flex flex-col h-full bg-slate-50 dark:bg-[#1A221E] lg:shadow-2xl transition-all duration-300 ease-in-out flex-grow ${activeView === 'chat' ? 'w-full animate-fade-in-fast' : 'w-0'} lg:flex`}>
-                    <header className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700/50 flex-shrink-0">
+                <div className={`flex flex-col h-full bg-slate-50 dark:bg-[#1A221E] lg:shadow-2xl transition-all duration-300 ease-in-out flex-grow ${activeView === 'chat' ? 'w-full animate-fade-in-fast' : 'w-0 hidden'} lg:flex`}>
+                    <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700/50 flex-shrink-0">
                         <div className="flex items-center gap-3">
-                            <LogoIcon className="w-10 h-10" />
+                            <AIAgentIcon className="w-10 h-10 text-[#4A5C50] dark:text-slate-100" />
                             <div>
-                                <h1 className="text-lg font-bold text-[#4A5C50] dark:text-slate-100">
-                                    Green<span style={{ color: '#D4A22E' }}>Gold</span>
-                                </h1>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{t('aiAssistant')}</p>
+                                <h1 className="text-lg font-bold text-[#4A5C50] dark:text-slate-100">{t('aiAssistant')}</h1>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">{user?.farmName || 'GreenGold'}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                              onClick={toggleTheme}
-                              className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-600 dark:text-slate-300"
-                              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-                            >
-                                {theme === 'light' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />}
-                            </button>
-                            <LanguageSwitcher onLanguageChange={handleLanguageChange} />
-                        </div>
-                    </header>
+                        <LanguageSwitcher onLanguageChange={setLanguage} />
+                    </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 relative pb-20 lg:pb-4">
                         {isTranslating && (
@@ -418,17 +358,10 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                                 <div className={`max-w-sm md:max-w-md ${msg.sender === Sender.USER ? 'items-end' : 'items-start'} flex flex-col`}>
                                     <div className={`p-3 rounded-2xl relative ${msg.sender === Sender.USER ? 'bg-[#D4A22E] text-white rounded-br-none' : 'bg-white dark:bg-[#202a25] text-slate-800 dark:text-slate-100 rounded-bl-none'}`}>
                                         {msg.image && <img src={msg.image} alt="user upload" className="rounded-lg mb-2 max-h-48"/>}
-                                        {msg.content.map((part, index) => {
-                                            if (part.type === 'text') {
-                                                return <div key={index} className="prose prose-sm dark:prose-invert max-w-none markdown-content" dangerouslySetInnerHTML={{ __html: part.value ? parseMarkdown(part.value) : '' }} />;
-                                            }
-                                            if (part.type === 'visualization' && part.data) {
-                                                return part.data.type === 'bar' 
-                                                    ? <BarChart key={index} vizData={part.data} />
-                                                    : <PieChart key={index} vizData={part.data} />;
-                                            }
-                                            return null;
-                                        })}
+                                        {msg.content.map((part, index) => (
+                                            part.type === 'text' ? <div key={index} className="prose prose-sm dark:prose-invert max-w-none markdown-content" dangerouslySetInnerHTML={{ __html: part.value ? parseMarkdown(part.value) : '' }} /> :
+                                            part.type === 'visualization' && part.data ? (part.data.type === 'bar' ? <BarChart key={index} vizData={part.data} /> : <PieChart key={index} vizData={part.data} />) : null
+                                        ))}
                                         {msg.sender === Sender.AI && msg.content.some(c => c.type === 'text' && c.value) && (
                                             <TTSButton text={msg.content.filter(c => c.type === 'text').map(c => c.value).join(' ')} />
                                         )}
@@ -470,43 +403,22 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                             <textarea
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleSendMessage(input, capturedImage || undefined);
-                                    }
-                                }}
+                                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(input, capturedImage || undefined); }}}
                                 placeholder={t('inputPlaceholder')}
                                 className="w-full p-3 pr-40 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#202a25] focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none resize-none"
                                 rows={1}
                             />
                             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                <button
-                                    onClick={handleToggleListening}
-                                    className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
-                                    title={t('speak')}
-                                >
+                                <button onClick={handleToggleListening} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400" title={t('speak')}>
                                     {isListening ? <Spinner className="w-6 h-6 text-red-500" /> : <MicrophoneIcon className="w-6 h-6" />}
                                 </button>
-                                <button
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
-                                    title={t('attachFile')}
-                                >
+                                <button onClick={() => fileInputRef.current?.click()} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400" title={t('attachFile')}>
                                     <UploadIcon className="w-6 h-6" />
                                 </button>
-                                <button
-                                    onClick={() => setShowCamera(true)}
-                                    className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
-                                    title={t('attachImage')}
-                                >
+                                <button onClick={() => setShowCamera(true)} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400" title={t('attachImage')}>
                                     <PhotoIcon className="w-6 h-6" />
                                 </button>
-                                <button
-                                    onClick={() => handleSendMessage(input, capturedImage || undefined)}
-                                    disabled={isLoading || (!input.trim() && !capturedImage)}
-                                    className="p-2 rounded-full bg-[#D4A22E] text-white disabled:bg-slate-400 dark:disabled:bg-slate-600 transition-colors"
-                                >
+                                <button onClick={() => handleSendMessage(input, capturedImage || undefined)} disabled={isLoading || (!input.trim() && !capturedImage)} className="p-2 rounded-full bg-[#D4A22E] text-white disabled:bg-slate-400 dark:disabled:bg-slate-600 transition-colors">
                                     <PaperAirplaneIcon className="w-6 h-6" />
                                 </button>
                             </div>
@@ -515,30 +427,18 @@ Based EXCLUSIVELY on the data above, please answer the user's question.
                 </div>
             </main>
 
-            {/* Mobile Bottom Navigation */}
-            <BottomNavBar 
-                activeView={activeView}
-                setActiveView={setActiveView}
-                onSettingsClick={() => setShowSettings(true)}
-                onLogsClick={() => setShowLogs(true)}
-            />
+            <BottomNavBar activeView={activeView} setActiveView={setActiveView} onSettingsClick={() => setShowSettings(true)} onLogsClick={() => setShowLogs(true)} />
             
-            {/* Modals */}
             {showSettings && <ModalPlaceholder title={t('settings')} onClose={() => setShowSettings(false)} />}
-            {showLogs && <ModalPlaceholder title={t('logs')} onClose={() => setShowLogs(false)} />}
+            {showLogs && <LogModal 
+                onClose={() => setShowLogs(false)} 
+                farmState={{ moisture, weather, phValue, npkValues, salinity }}
+            />}
 
-            {/* Other Overlays */}
-            <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                className="hidden"
-                accept="image/*"
-            />
+            <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" />
             {showCamera && <CameraCapture onClose={() => setShowCamera(false)} onCapture={handleImageCapture} />}
         </div>
     );
 };
 
-// FIX: Add default export for the App component.
 export default App;
