@@ -11,13 +11,14 @@ import ImpactWidget from './ImpactWidget';
 import SalinityWidget from './SalinityWidget';
 import PHWidget from './PHWidget';
 import NPKWidget from './NPKWidget';
-import { WeatherCondition, NPKValues } from '../types';
+import { WeatherCondition, NPKValues, User } from '../types';
 import TimeOfDayWidget from './TimeOfDayWidget';
 import IrrigationAdvisorWidget from './IrrigationAdvisorWidget';
 import { useLocalization } from '../hooks/useLocalization';
 import ActionsWidget from './ActionsWidget';
 
 interface DashboardProps {
+    user: User | null;
     onExplain: (prompt: string) => void;
     moisture: number;
     setMoisture: React.Dispatch<React.SetStateAction<number>>;
@@ -37,7 +38,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
     const { t } = useLocalization();
-    const { onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues, salinity, setSalinity } = props;
+    const { user, onExplain, moisture, setMoisture, isIrrigating, setIsIrrigating, isDraining, setIsDraining, weather, setWeather, phValue, setPhValue, npkValues, setNpkValues, salinity, setSalinity } = props;
 
     // Effect for rain simulation
     React.useEffect(() => {
@@ -101,7 +102,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-min gap-6">
                 
                 <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '100ms'}}>
-                    <WidgetWrapper title={t('farmerName')} explanation={t('timeOfDayExplain')} explanationPrompt={t('timeOfDayExplainPrompt')} onExplain={onExplain}><TimeOfDayWidget /></WidgetWrapper>
+                    <WidgetWrapper title={user?.name || t('farmerName')} explanation={t('timeOfDayExplain')} explanationPrompt={t('timeOfDayExplainPrompt')} onExplain={onExplain}><TimeOfDayWidget user={user} /></WidgetWrapper>
                 </div>
 
                 <div className="lg:col-span-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms'}}>

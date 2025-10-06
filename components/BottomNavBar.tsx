@@ -1,12 +1,12 @@
 import React from 'react';
-import { HomeIcon, ChatIcon, SettingsIcon, LogIcon } from './Icons';
+import { HomeIcon, ChatBubbleLeftEllipsisIcon, Cog6ToothIcon, DocumentTextIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
-type ActiveView = 'dashboard' | 'chat';
+type MobileView = 'dashboard' | 'chat';
 
 interface BottomNavBarProps {
-    activeView: ActiveView;
-    setActiveView: (view: ActiveView) => void;
+    activeView: MobileView;
+    setActiveView: (view: MobileView) => void;
     onSettingsClick: () => void;
     onLogsClick: () => void;
 }
@@ -44,20 +44,20 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, setActiveView, 
                 />
                  <NavButton
                     label={t('chat')}
-                    icon={ChatIcon}
+                    icon={ChatBubbleLeftEllipsisIcon}
                     isActive={activeView === 'chat'}
                     onClick={() => setActiveView('chat')}
                 />
                  <NavButton
                     label={t('logs')}
-                    icon={LogIcon}
-                    isActive={false} // This is a modal trigger, not a view
+                    icon={DocumentTextIcon}
+                    isActive={false}
                     onClick={onLogsClick}
                 />
                  <NavButton
                     label={t('settings')}
-                    icon={SettingsIcon}
-                    isActive={false} // This is a modal trigger, not a view
+                    icon={Cog6ToothIcon}
+                    isActive={false}
                     onClick={onSettingsClick}
                 />
             </div>

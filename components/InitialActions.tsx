@@ -1,5 +1,5 @@
 import React from 'react';
-import { SmartIrrigationIcon, SalinityIcon, FertigationIcon } from './Icons';
+import { WifiIcon, BeakerIcon, ClipboardDocumentListIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
 interface InitialActionsProps {
@@ -10,9 +10,9 @@ const InitialActions: React.FC<InitialActionsProps> = ({ onAction }) => {
     const { t } = useLocalization();
 
     const initialActions = [
-      { label: t('smartIrrigation'), prompt: t('smartIrrigationPrompt'), icon: SmartIrrigationIcon, color: 'blue' },
-      { label: t('salinityCheck'), prompt: t('salinityCheckPrompt'), icon: SalinityIcon, color: 'gray' },
-      { label: t('fertigationPlan'), prompt: t('fertigationPlanPrompt'), icon: FertigationIcon, color: 'green' }
+      { label: t('smartIrrigation'), prompt: t('smartIrrigationPrompt'), icon: WifiIcon, color: 'blue' },
+      { label: t('salinityCheck'), prompt: t('salinityCheckPrompt'), icon: BeakerIcon, color: 'gray' },
+      { label: t('fertigationPlan'), prompt: t('fertigationPlanPrompt'), icon: ClipboardDocumentListIcon, color: 'green' }
     ];
 
     return (

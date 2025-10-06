@@ -1,6 +1,7 @@
 // FIX: This file was created to provide a smart irrigation advisor widget.
 import React from 'react';
 import WidgetWrapper from './WidgetWrapper';
+// FIX: Added the SmartIrrigationIcon to the Icons.tsx file and imported it here to resolve the missing member error.
 import { SmartIrrigationIcon, PHIcon, SunIcon, ArrowTrendingUpIcon, CloudRainIcon, QuestionMarkCircleIcon, CheckCircleIcon, ExclamationTriangleIcon, ArrowPathIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 import { WeatherCondition } from '../types';

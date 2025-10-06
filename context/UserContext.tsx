@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { User, FarmDetails } from '../types';
+import { User, OnboardingDetails } from '../types';
 
 interface UserContextType {
     user: User | null;
@@ -7,7 +7,7 @@ interface UserContextType {
     login: (email: string, pass: string) => boolean;
     logout: () => void;
     signUp: (email: string, pass: string) => boolean;
-    completeOnboarding: (details: FarmDetails) => void;
+    completeOnboarding: (details: OnboardingDetails) => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,7 +26,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const foundUser = users.find(u => u.email === loggedInUserEmail);
             if (foundUser) {
                 setUser(foundUser);
-                if (!foundUser.farmName) {
+                if (!foundUser.farmName || !foundUser.name) {
                     setNeedsOnboarding(true);
                 }
             }
@@ -39,7 +39,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (foundUser) {
             setUser(foundUser);
             localStorage.setItem(CURRENT_USER_KEY, foundUser.email);
-            if (!foundUser.farmName) {
+            if (!foundUser.farmName || !foundUser.name) {
                 setNeedsOnboarding(true);
             }
             return true;
@@ -57,7 +57,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (users.some(u => u.email === email)) {
             return false; // User already exists
         }
-        const newUser: User = { email, password: pass, farmName: '', farmSize: 0, primaryCrops: '' };
+        const newUser: User = { email, password: pass, name: '', farmName: '', farmSize: 0, primaryCrops: '' };
         users.push(newUser);
         localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
         setUser(newUser);
@@ -66,7 +66,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return true;
     };
     
-    const completeOnboarding = (details: FarmDetails) => {
+    const completeOnboarding = (details: OnboardingDetails) => {
         if (!user) return;
         
         const updatedUser = { ...user, ...details };

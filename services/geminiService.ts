@@ -110,9 +110,11 @@ export const getGeminiResponse = async (prompt: string, language: string, farmCo
             config: {
                 responseMimeType: "application/json",
                 responseSchema: responseSchema,
+                // FIX: Corrected thinkingConfig parameter usage as per coding guidelines for low latency tasks.
                 thinkingConfig: { thinkingBudget: 0 },
                 systemInstruction: `You are GreenGold, an AI assistant for agriculture. Your goal is to provide expert advice to farmers in a way that is very easy to understand.
 - **VERY IMPORTANT**: You MUST use the "CURRENT FARM DATA" provided at the beginning of the user's prompt to formulate a specific, contextual, and actionable response. Do not give generic advice. Your advice must reflect the provided data points (weather, soil moisture, pH, NPK, etc.).
+- **Greeting**: If it is the first message of a conversation, start by greeting the user by their name (e.g., "Hello, [User's Name]!").
 - **Be Concise**: Your answers MUST be short and to the point. Use bullet points.
 - **Simplicity is Key**: Use simple, direct language. Avoid technical jargon.
 - **Actionable Advice**: Offer clear, step-by-step solutions that a farmer can immediately act on.
@@ -125,8 +127,20 @@ export const getGeminiResponse = async (prompt: string, language: string, farmCo
         });
         
         // FIX: Extract text and parse JSON response.
-        const jsonText = response.text.trim();
-        const parsedResponse = JSON.parse(jsonText);
+        const jsonText = response.text;
+        let parsedResponse;
+        try {
+            parsedResponse = JSON.parse(jsonText);
+        } catch (e) {
+            console.error("Failed to parse JSON response:", jsonText);
+            // Handle cases where response is not valid JSON, maybe it's just a string.
+            return {
+                id: Date.now().toString(),
+                sender: Sender.AI,
+                content: [{ type: 'text', value: jsonText, originalValue: jsonText }]
+            };
+        }
+
 
         const content: MessageContent[] = [];
 
@@ -184,7 +198,7 @@ export const translateTexts = async (texts: string[], targetLanguage: string): P
             }
         });
 
-        const jsonText = response.text.trim();
+        const jsonText = response.text;
         const parsedResponse = JSON.parse(jsonText);
 
         if (parsedResponse.translations && Array.isArray(parsedResponse.translations) && parsedResponse.translations.length === texts.length) {

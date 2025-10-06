@@ -48,7 +48,12 @@ export interface FarmDetails {
     primaryCrops: string;
 }
 
-export interface User extends FarmDetails {
+// FIX: Added 'name' to the User interface and created a separate OnboardingDetails type.
+export interface OnboardingDetails extends FarmDetails {
+    name: string;
+}
+
+export interface User extends OnboardingDetails {
     email: string;
     password?: string; // Optional for security reasons when handling user objects
 }

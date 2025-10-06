@@ -103,6 +103,17 @@
       .animate-subtle-pulse { animation: subtle-pulse 2.5s ease-in-out infinite; }
       @keyframes boing { 0%, 100% { transform: scale(1); } 20% { transform: scale(0.95); } 50% { transform: scale(1.1); } }
       .animate-boing { animation: boing 0.5s ease-out; }
+
+      /* View transition animations */
+      @keyframes slide-in-from-right { 0% { transform: translateX(100%); } 100% { transform: translateX(0); } }
+      @keyframes slide-out-to-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+      @keyframes slide-in-from-left { 0% { transform: translateX(-100%); } 100% { transform: translateX(0); } }
+      @keyframes slide-out-to-right { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+
+      .view-slide-in-from-right { animation: slide-in-from-right 0.3s ease-out forwards; }
+      .view-slide-out-to-left { animation: slide-out-to-left 0.3s ease-out forwards; }
+      .view-slide-in-from-left { animation: slide-in-from-left 0.3s ease-out forwards; }
+      .view-slide-out-to-right { animation: slide-out-to-right 0.3s ease-out forwards; }
     </style>
 <script type="importmap">
 {

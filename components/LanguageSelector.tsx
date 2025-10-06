@@ -17,18 +17,19 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageSelect })
 
   return (
     <div className="fixed inset-0 bg-slate-100 dark:bg-[#141615] flex flex-col items-center justify-center z-50 p-4 overflow-y-auto animate-fade-in">
-      <div className="text-center w-full max-w-2xl mx-auto py-8">
+      <div className="text-center w-full max-w-4xl mx-auto py-8">
         <LogoIcon className="w-24 h-24 mx-auto mb-6 opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }} />
-        <h1 className="text-3xl font-bold tracking-tight text-[#4A5C50] dark:text-slate-200 mb-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms' }}>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#4A5C50] dark:text-slate-200 mb-2 opacity-0 animate-slide-in-up" style={{ animationDelay: '200ms' }}>
             {t('welcomeTo')} Green<span style={{ color: '#D4A22E' }}>Gold</span>
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 mb-8 opacity-0 animate-slide-in-up" style={{ animationDelay: '300ms' }}>{t('selectLanguage')}</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 opacity-0 animate-slide-in-up" style={{ animationDelay: '400ms' }}>
-          {languages.map((lang) => (
+        <p className="text-slate-600 dark:text-slate-400 mb-10 text-lg opacity-0 animate-slide-in-up" style={{ animationDelay: '300ms' }}>{t('selectLanguage')}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 opacity-0 animate-slide-in-up" style={{ animationDelay: '400ms' }}>
+          {languages.map((lang, index) => (
             <button
               key={lang.code}
               onClick={() => handleSelect(lang.code)}
               className="p-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-sm ring-1 ring-slate-200/80 dark:ring-slate-800/60 bg-white/80 dark:bg-[#202a25]/80 hover:bg-slate-50 dark:hover:bg-[#2a3831] text-slate-800 dark:text-slate-200"
+              style={{ animation: `slide-in-bottom 0.5s ease-out ${400 + index * 30}ms forwards`, opacity: 0 }}
             >
               {lang.name}
             </button>

@@ -1,6 +1,8 @@
 
 
+
 import React from 'react';
+// FIX: Added the SalinityIcon to the Icons.tsx file and imported it here to resolve the missing member error.
 import { SalinityIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
