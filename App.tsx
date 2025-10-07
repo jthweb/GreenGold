@@ -101,8 +101,8 @@ const App: React.FC = () => {
     const [isIrrigating, setIsIrrigating] = useState(false);
     const [isDraining, setIsDraining] = useState(false);
     const [weather, setWeather] = useState<WeatherCondition>('sunny');
-    const [phValue, setPhValue] = useState(6.8);
-    const [npkValues, setNpkValues] = useState<NPKValues>({ n: 18, p: 9, k: 15 });
+    const [phValue, setPhValue] = useState(7.8);
+    const [npkValues, setNpkValues] = useState<NPKValues>({ n: 5, p: 18, k: 15 });
     const [salinity, setSalinity] = useState(1.8);
 
     // Speech Recognition State
@@ -275,7 +275,7 @@ const App: React.FC = () => {
             
             <div className="flex-1 flex pt-16 overflow-hidden">
                 {/* Desktop: Fixed Dashboard (Scrollable) */}
-                <div className="hidden lg:block lg:w-1/2 xl:w-3/5 border-r border-slate-200 dark:border-slate-800 overflow-y-auto">
+                <div className="hidden lg:block lg:w-[60%] border-r border-slate-200 dark:border-slate-800 overflow-y-auto">
                     <Dashboard user={user} idealConditions={user?.idealConditions} onExplain={handleSendMessage} moisture={moisture} setMoisture={setMoisture} isIrrigating={isIrrigating} setIsIrrigating={setIsIrrigating} isDraining={isDraining} setIsDraining={setIsDraining} weather={weather} setWeather={setWeather} phValue={phValue} setPhValue={setPhValue} npkValues={npkValues} setNpkValues={setNpkValues} salinity={salinity} setSalinity={setSalinity}/>
                 </div>
 
@@ -292,7 +292,7 @@ const App: React.FC = () => {
                 </div>
                 
                 {/* Desktop: Fixed Chat */}
-                <div className="hidden lg:flex lg:w-1/2 xl:w-2/5">
+                <div className="hidden lg:flex lg:w-[40%]">
                     <ChatPanel messages={messages} isLoading={isLoading} input={input} setInput={setInput} handleSendMessage={handleSendMessage} setShowCamera={setShowCamera} isListening={isListening} toggleListening={toggleListening} handleLanguageChange={handleLanguageChange} />
                 </div>
             </div>
@@ -318,15 +318,15 @@ const App: React.FC = () => {
             return <OnboardingScreen onComplete={completeOnboarding} />;
         }
 
-        switch (currentView) {
-            case 'logs':
-                return <LogsPanel onBack={() => setCurrentView('main')} farmState={{ moisture, weather, phValue, npkValues, salinity }} />;
-            case 'settings':
-                return <SettingsPanel onBack={() => setCurrentView('main')} />;
-            case 'main':
-            default:
-                return mainAppContent;
-        }
+        return (
+             <div className="h-full w-full relative">
+                <div className={`${currentView === 'main' ? 'z-10' : 'z-0'}`}>
+                    {mainAppContent}
+                </div>
+                {currentView === 'logs' && <LogsPanel onBack={() => setCurrentView('main')} farmState={{ moisture, weather, phValue, npkValues, salinity }} />}
+                {currentView === 'settings' && <SettingsPanel onBack={() => setCurrentView('main')} />}
+            </div>
+        )
     };
     
     return (

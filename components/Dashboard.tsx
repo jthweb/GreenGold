@@ -46,14 +46,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
         let rainInterval: number | null = null;
         if (weather === 'rainy' && !isIrrigating && !isDraining) {
             rainInterval = window.setInterval(() => {
-                setMoisture(prev => {
-                    const newMoisture = prev + 0.2;
-                    if (newMoisture >= 110) {
-                        if (rainInterval) clearInterval(rainInterval);
-                        return 110;
-                    }
-                    return newMoisture;
-                });
+                setMoisture(prev => Math.min(150, prev + 0.2)); // Allow waterlogging up to 150%
             }, 200);
         }
         return () => {
@@ -100,7 +93,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
     
     return (
         <div className="p-4 sm:p-6 lg:p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-min gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-min gap-4">
                 
                 <div className="md:col-span-2 lg:col-span-4 opacity-0 animate-slide-in-up" style={{ animationDelay: '100ms'}}>
                     <WidgetWrapper title="" explanation="" explanationPrompt="" onExplain={() => {}} hasNoHeader>

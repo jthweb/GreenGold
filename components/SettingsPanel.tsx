@@ -23,6 +23,12 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onBack }) => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+    const [isExiting, setIsExiting] = useState(false);
+
+    const handleBack = () => {
+        setIsExiting(true);
+        setTimeout(onBack, 300); // Match animation duration
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -49,9 +55,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onBack }) => {
     };
 
     return (
-        <div className="absolute inset-0 bg-slate-100 dark:bg-[#141615] z-50 flex flex-col animate-fade-in">
+        <div className={`absolute inset-0 bg-slate-100 dark:bg-[#141615] z-50 flex flex-col ${isExiting ? 'animate-view-slide-out' : 'animate-view-slide-in'}`}>
              <header className="flex-shrink-0 bg-white/80 dark:bg-[#202a25]/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700/50 h-16 flex items-center px-4">
-                <button onClick={onBack} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                <button onClick={handleBack} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
                     <ChevronLeftIcon className="w-6 h-6" />
                 </button>
                 <h2 className="text-lg font-bold text-[#4A5C50] dark:text-slate-200 mx-auto">{t('settings')}</h2>

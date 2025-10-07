@@ -23,9 +23,9 @@ const WidgetWrapper: React.FC<WidgetWrapperProps> = ({ title, children, explanat
     }
 
     return (
-        <div className="bg-white dark:bg-[#202a25] rounded-xl shadow-sm h-full flex flex-col transition-transform duration-300 lg:hover:scale-[1.02]">
-            <div className="p-4 border-b border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300">{title}</h3>
+        <div className="bg-white dark:bg-[#202a25] rounded-2xl shadow-lg h-full flex flex-col transition-all duration-300 lg:hover:shadow-xl lg:hover:scale-[1.02]">
+            <div className="p-5 flex items-center justify-between">
+                <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">{title}</h3>
                 {explanation && explanationPrompt && onExplain && (
                     <div className="relative group">
                         <QuestionMarkCircleIcon className="w-5 h-5 text-slate-400 dark:text-slate-500 cursor-help" />
@@ -42,7 +42,7 @@ const WidgetWrapper: React.FC<WidgetWrapperProps> = ({ title, children, explanat
                     </div>
                 )}
             </div>
-            <div className="p-4 flex-1">
+            <div className="p-5 pt-0 flex-1">
                 {children}
             </div>
         </div>

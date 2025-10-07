@@ -27,7 +27,7 @@ const SoilMoistureWidget: React.FC<SoilMoistureWidgetProps> = ({ moisture, ideal
             intervalRef.current = window.setInterval(() => {
                 seconds++;
                 const increment = seconds <= 5 ? 1 : 1 / 12;
-                setMoisture(prev => Math.min(110, prev + increment));
+                setMoisture(prev => Math.min(100, prev + increment));
             }, 500);
 
         } else if (intervalRef.current) {
@@ -42,7 +42,7 @@ const SoilMoistureWidget: React.FC<SoilMoistureWidgetProps> = ({ moisture, ideal
     }, [isIrrigating, setMoisture]);
     
     useEffect(() => {
-        if (moisture >= 110 && isIrrigating) {
+        if (moisture >= 100 && isIrrigating) {
             setIsIrrigating(false);
         }
     }, [moisture, isIrrigating, setIsIrrigating]);
@@ -111,7 +111,7 @@ const SoilMoistureWidget: React.FC<SoilMoistureWidgetProps> = ({ moisture, ideal
                 <button
                     onClick={() => setIsIrrigating(!isIrrigating)}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={moisture >= 110 || isDraining || (weather === 'rainy')}
+                    disabled={moisture >= 100 || isDraining || (weather === 'rainy')}
                 >
                     {isIrrigating ? <StopIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
                     {isIrrigating ? t('stopIrrigation') : t('startIrrigation')}

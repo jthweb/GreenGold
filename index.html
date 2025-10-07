@@ -37,10 +37,12 @@
       body {
         font-family: 'Inter', sans-serif;
         background-color: #f8fafc;
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         transition: background-color 0.3s ease-in-out;
       }
       .dark body {
         background-color: #141615;
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23475569' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
       }
       @keyframes rise {
         0% {
@@ -104,28 +106,35 @@
         font-weight: 600;
       }
       @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+      .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+
       @keyframes fade-in-fast { 0% { opacity: 0; } 100% { opacity: 1; } }
       .animate-fade-in-fast { animation: fade-in-fast 0.3s ease-out forwards; }
+      
       @keyframes slide-in-up { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-      .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
-      .animate-slide-in-up { animation: slide-in-up 0.5s ease-out forwards; }
+      .animate-slide-in-up { animation: slide-in-up 0.5s cubic-bezier(0.21, 1.02, 0.73, 1) forwards; }
+
       @keyframes slide-in-bottom { 0% { transform: translateY(15px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
       .animate-slide-in-bottom { animation: slide-in-bottom 0.4s ease-out forwards; }
+
       @keyframes subtle-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } }
       .animate-subtle-pulse { animation: subtle-pulse 2.5s ease-in-out infinite; }
-      @keyframes boing { 0%, 100% { transform: scale(1); } 20% { transform: scale(0.95); } 50% { transform: scale(1.1); } }
-      .animate-boing { animation: boing 0.5s ease-out; }
-
+      
       /* View transition animations */
-      @keyframes slide-in-from-right { 0% { transform: translateX(100%); } 100% { transform: translateX(0); } }
-      @keyframes slide-out-to-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-      @keyframes slide-in-from-left { 0% { transform: translateX(-100%); } 100% { transform: translateX(0); } }
-      @keyframes slide-out-to-right { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
-
-      .view-slide-in-from-right { animation: slide-in-from-right 0.3s ease-out forwards; }
-      .view-slide-out-to-left { animation: slide-out-to-left 0.3s ease-out forwards; }
-      .view-slide-in-from-left { animation: slide-in-from-left 0.3s ease-out forwards; }
-      .view-slide-out-to-right { animation: slide-out-to-right 0.3s ease-out forwards; }
+      @keyframes view-slide-in {
+        0% { transform: translateX(100%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+      }
+      .animate-view-slide-in {
+        animation: view-slide-in 0.4s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+      }
+      @keyframes view-slide-out {
+        0% { transform: translateX(0); opacity: 1; }
+        100% { transform: translateX(100%); opacity: 0; }
+      }
+      .animate-view-slide-out {
+        animation: view-slide-out 0.3s ease-out forwards;
+      }
     </style>
 <script type="importmap">
 {

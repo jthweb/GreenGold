@@ -21,6 +21,12 @@ export const ChatBubbleLeftEllipsisIcon: React.FC<IconProps> = ({ className }) =
     </svg>
 );
 
+export const ChatBubbleLeftRightIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193l-3.72 3.72a1.125 1.125 0 0 1-1.59 0l-3.72-3.72a2.122 2.122 0 0 1-1.98-2.193v-4.286c0-.97.616-1.813 1.5-2.097m14.25-6.118c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193l-3.72 3.72a1.125 1.125 0 0 1-1.59 0l-3.72-3.72a2.122 2.122 0 0 1-1.98-2.193v-4.286c0-.97.616-1.813 1.5-2.097L16.5 3.64m-11.25 6.118c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193l-3.72 3.72a1.125 1.125 0 0 1-1.59 0L.39 18.46a2.122 2.122 0 0 1-1.98-2.193v-4.286c0-.97.616-1.813 1.5-2.097L5.25 3.64" />
+    </svg>
+);
+
 export const ClipboardDocumentCheckIcon: React.FC<IconProps> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 0 1 9 9v.375M10.125 2.25A3.375 3.375 0 0 1 13.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 0 1 3.375 3.375M9 15l2.25 2.25L15 12" />
@@ -29,9 +35,16 @@ export const ClipboardDocumentCheckIcon: React.FC<IconProps> = ({ className }) =
 
 export const Cog6ToothIcon: React.FC<IconProps> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-1.008 1.11-1.226.55-.218 1.192-.218 1.742 0 .55.218 1.02.684 1.11 1.226M10.343 20.06c.09.542.56 1.008 1.11 1.226.55.218 1.192-.218 1.742 0 .55-.218 1.02-.684 1.11-1.226M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.959 8.959 0 0 1-4.5-1.226M12 21a8.959 8.959 0 0 0 4.5-1.226M12 3a8.959 8.959 0 0 1 4.5 1.226M12 3a8.959 8.959 0 0 0-4.5 1.226M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-1.008 1.11-1.226.55-.218 1.192-.218 1.742 0 .55.218 1.02.684 1.11 1.226M10.343 20.06c.09.542.56 1.008 1.11 1.226.55-.218 1.192-.218 1.742 0 .55-.218 1.02-.684 1.11-1.226M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.959 8.959 0 0 1-4.5-1.226M12 21a8.959 8.959 0 0 0 4.5-1.226M12 3a8.959 8.959 0 0 1 4.5 1.226M12 3a8.959 8.959 0 0 0-4.5-1.226M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
     </svg>
 );
+
+export const Cog8ToothIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-1.008 1.11-1.226.55-.218 1.192-.218 1.742 0 .55.218 1.02.684 1.11 1.226M10.343 20.06c.09.542.56 1.008 1.11 1.226.55-.218 1.192-.218 1.742 0 .55-.218 1.02.684 1.11-1.226m5.254-12.13a9 9 0 1 0-12.13 5.254m12.13-5.254-.353-.353M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.96 8.96 0 0 1-1.226-4.5m1.226 4.5a8.96 8.96 0 0 0 1.226-4.5M12 3a8.96 8.96 0 0 1 1.226 4.5M12 3a8.96 8.96 0 0 0-1.226 4.5m0 0a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm-5.254-1.647 3.536 3.536" />
+    </svg>
+);
+
 
 // --- GENERAL UI ICONS ---
 
@@ -84,6 +97,11 @@ export const QuestionMarkCircleIcon: React.FC<IconProps> = ({ className }) => (
     </svg>
 );
 
+export const GlobeAltIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21v-7.247M12 3a9.004 9.004 0 0 0-8.716 6.747M12 3v7.247m0 0a9.004 9.004 0 0 1 8.716-6.747m-8.716 6.747a9.004 9.004 0 0 0-8.716-6.747M3 12h18" />
+    </svg>
+);
 
 // --- CHAT ICONS ---
 export const PaperAirplaneIcon: React.FC<IconProps> = ({ className }) => (
