@@ -32,3 +32,6 @@ First off, thank you for considering contributing to GreenGold! It's people like
 This project and everyone participating in it is expected to follow respectful and constructive communication. Harassment or exclusionary behavior will not be tolerated.
 
 We are excited to see your contributions!
+
+---
+
