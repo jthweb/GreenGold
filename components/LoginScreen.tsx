@@ -35,11 +35,11 @@ const LoginScreen: React.FC = () => {
                     <div className="flex border-b border-slate-200 dark:border-slate-700 mb-6">
                         <button
                             onClick={() => { setMode('login'); setError(null); }}
-                            className={`w-1/2 pb-3 font-semibold text-center transition-colors ${mode === 'login' ? 'text-[#D4A22E] border-b-2 border-[#D4A22E]' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`w-1/2 pb-3 font-semibold text-center transition-colors ${mode === 'login' ? 'text-[#D4A22E] border-b-2 border-[#D4A22E]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                         >{t('login')}</button>
                         <button
                             onClick={() => { setMode('signup'); setError(null); }}
-                            className={`w-1/2 pb-3 font-semibold text-center transition-colors ${mode === 'signup' ? 'text-[#D4A22E] border-b-2 border-[#D4A22E]' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`w-1/2 pb-3 font-semibold text-center transition-colors ${mode === 'signup' ? 'text-[#D4A22E] border-b-2 border-[#D4A22E]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                         >{t('signUp')}</button>
                     </div>
 
@@ -67,7 +67,7 @@ const LoginScreen: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500 dark:text-slate-400"
+                                    className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                                     title={showPassword ? t('hidePassword') : t('showPassword')}
                                 >
                                     {showPassword ? <EyeSlashIcon className="h-5 w-5"/> : <EyeIcon className="h-5 w-5"/>}

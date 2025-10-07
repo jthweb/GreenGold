@@ -19,7 +19,7 @@ const NavButton: React.FC<{
 }> = ({ label, icon: Icon, isActive, onClick }) => (
     <button
         onClick={onClick}
-        className="relative flex flex-col items-center justify-center w-full h-16 transition-colors duration-300 ease-out focus:outline-none z-10"
+        className="relative flex flex-col items-center justify-center w-full h-16 transition-all duration-300 ease-out focus:outline-none z-10 transform hover:scale-105"
         aria-label={label}
     >
         <Icon className={`w-6 h-6 transition-all duration-300 ease-out ${isActive ? '-translate-y-1 text-[#D4A22E]' : 'translate-y-1 text-slate-500 dark:text-slate-400'}`} />

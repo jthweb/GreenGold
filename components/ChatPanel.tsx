@@ -144,7 +144,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                     <button onClick={() => setShowCamera(true)} className="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700/60 text-slate-500 dark:text-slate-400 transition-colors">
                         <CameraIcon className="w-5 h-5" />
                     </button>
-                    <button onClick={() => handleSendMessage()} disabled={isLoading || !input.trim()} className="p-3 rounded-full bg-[#D4A22E] text-white disabled:bg-slate-400 dark:disabled:bg-slate-600 transition-colors">
+                    <button onClick={() => handleSendMessage()} disabled={isLoading || !input.trim()} className="p-3 rounded-full bg-[#D4A22E] text-white disabled:bg-slate-400 dark:disabled:bg-slate-600 transition-opacity hover:opacity-90">
                         <PaperAirplaneIcon className="w-5 h-5" />
                     </button>
                 </div>

@@ -106,8 +106,8 @@ const LogsPanel: React.FC<LogsPanelProps> = ({ onBack, farmState }) => {
                             />
                         </div>
                         <div className="flex gap-2 mt-4">
-                             <button onClick={() => setIsCreating(false)} className="w-full py-2 rounded-lg bg-slate-200 dark:bg-slate-700 font-semibold">{t('cancel')}</button>
-                             <button onClick={handleSaveLog} className="w-full py-2 rounded-lg bg-[#D4A22E] text-white font-semibold">{t('saveLog')}</button>
+                             <button onClick={() => setIsCreating(false)} className="w-full py-2 rounded-lg bg-slate-200 dark:bg-slate-700 font-semibold transition-colors hover:bg-slate-300 dark:hover:bg-slate-600">{t('cancel')}</button>
+                             <button onClick={handleSaveLog} className="w-full py-2 rounded-lg bg-[#D4A22E] text-white font-semibold transition-opacity hover:opacity-90">{t('saveLog')}</button>
                         </div>
                     </div>
                 ) : (

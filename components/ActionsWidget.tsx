@@ -1,14 +1,11 @@
 
-
-
-
 import React from 'react';
 // FIX: Replaced FlaskIcon with the available BeakerIcon to resolve an import error.
 import { PlusIcon, BeakerIcon, SunIcon } from './Icons';
 import { useLocalization } from '../hooks/useLocalization';
 
 const ActionButton: React.FC<{ icon: React.FC<{className?: string}>, label: string, onClick: () => void }> = ({ icon: Icon, label, onClick }) => (
-    <button onClick={onClick} className="flex flex-col items-center justify-center gap-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors w-full h-full">
+    <button onClick={onClick} className="flex flex-col items-center justify-center gap-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all transform hover:scale-105 w-full h-full">
         <Icon className="w-6 h-6 text-slate-700 dark:text-slate-200" />
         <span className="text-xs font-semibold text-center text-slate-700 dark:text-slate-200">{label}</span>
     </button>

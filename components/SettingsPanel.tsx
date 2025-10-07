@@ -74,7 +74,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onBack }) => {
                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('password')}</label>
                         <div className="relative">
                             <input type={showPassword ? 'text' : 'password'} name="password" value={details.password} onChange={handleChange} placeholder={t('passwordPlaceholder')} className="mt-1 w-full p-3 pr-10 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1A221E] focus:ring-2 focus:ring-[#D4A22E] outline-none" />
-                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500">
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
                                 {showPassword ? <EyeSlashIcon className="h-5 w-5"/> : <EyeIcon className="h-5 w-5"/>}
                             </button>
                         </div>
