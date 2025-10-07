@@ -22,8 +22,8 @@ const NavButton: React.FC<{
         className="relative flex flex-col items-center justify-center w-full h-16 transition-colors duration-300 ease-out focus:outline-none z-10"
         aria-label={label}
     >
-        <Icon className={`w-6 h-6 mb-1 transition-colors ${isActive ? 'text-[#D4A22E]' : 'text-slate-500 dark:text-slate-400'}`} />
-        <span className={`text-xs font-bold transition-all duration-300 ${isActive ? 'opacity-100 text-[#D4A22E]' : 'opacity-0 -translate-y-1'}`}>{label}</span>
+        <Icon className={`w-6 h-6 transition-all duration-300 ease-out ${isActive ? '-translate-y-1 text-[#D4A22E]' : 'translate-y-1 text-slate-500 dark:text-slate-400'}`} />
+        <span className={`text-xs font-bold transition-all duration-300 ${isActive ? 'opacity-100 text-[#D4A22E]' : 'opacity-0'}`}>{label}</span>
     </button>
 );
 
@@ -40,7 +40,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, setActiveView, 
 
     return (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/80 dark:bg-[#202a25]/80 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700/50 z-30">
-            <div className="relative flex justify-around items-start h-full">
+            <div className="relative flex justify-around items-center h-full">
                 <div 
                     className="absolute top-1/2 -translate-y-1/2 h-10 w-20 bg-amber-400/10 dark:bg-amber-400/5 rounded-full transition-transform duration-300 ease-out"
                     style={{ transform: `translateX(calc(${activeIndex * 100}% - 50% + 12.5%))` }}

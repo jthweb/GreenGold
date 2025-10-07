@@ -73,13 +73,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 {messages.map((msg) => (
                     <div key={msg.id} className={`flex items-end gap-2 ${msg.sender === Sender.USER ? 'justify-end' : 'justify-start'} animate-slide-in-bottom`}>
                         {msg.sender === Sender.AI && (
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-700">
-                                <AIAgentIcon className={`w-6 h-6 text-slate-600 dark:text-slate-300 ${isLoading && messages[messages.length - 1]?.id === msg.id ? 'animate-subtle-pulse' : ''}`} />
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                                <AIAgentIcon className={`w-6 h-6 text-gray-600 dark:text-gray-300 ${isLoading && messages[messages.length - 1]?.id === msg.id ? 'animate-subtle-pulse' : ''}`} />
                             </div>
                         )}
                         <div className={`max-w-xs md:max-w-md lg:max-w-lg relative`}>
                             {msg.image && <img src={msg.image} alt="User upload" className="rounded-xl mb-2" />}
-                            <div className={`px-4 py-3 rounded-2xl ${msg.sender === Sender.AI ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none' : 'bg-[#D4A22E] text-white rounded-br-none'}`}>
+                            <div className={`px-4 py-3 rounded-2xl ${msg.sender === Sender.AI ? 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-bl-none' : 'bg-[#D4A22E] text-white rounded-br-none'}`}>
                                 {msg.content.map((c, i) => <div key={i}>{renderContent(c)}</div>)}
                                 {msg.sender === Sender.AI && <TTSButton text={msg.content.filter(c => c.type === 'text').map(c => c.value).join(' ')} />}
                             </div>
@@ -106,11 +106,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 ))}
                 {isLoading && messages[messages.length - 1]?.sender === Sender.USER && (
                     <div className="flex items-end gap-2 justify-start animate-slide-in-bottom">
-                         <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-700">
-                            <AIAgentIcon className="w-6 h-6 text-slate-600 dark:text-slate-300 animate-subtle-pulse" />
+                         <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                            <AIAgentIcon className="w-6 h-6 text-gray-600 dark:text-gray-300 animate-subtle-pulse" />
                         </div>
-                        <div className="max-w-xs px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 rounded-bl-none">
-                            <Spinner className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                        <div className="max-w-xs px-4 py-3 rounded-2xl bg-gray-100 dark:bg-gray-800 rounded-bl-none">
+                            <Spinner className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                         </div>
                     </div>
                 )}
@@ -119,9 +119,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             </div>
 
             <div className="p-4 bg-white dark:bg-[#202a25] border-t border-slate-200 dark:border-slate-800">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                     <LanguageSwitcher onLanguageChange={handleLanguageChange} />
-                     <button onClick={toggleListening} className={`p-2.5 rounded-full transition-colors text-slate-500 dark:text-slate-400 ${isListening ? 'bg-red-500/20 text-red-500' : 'hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                     <button onClick={toggleListening} className={`p-2.5 rounded-full transition-colors text-slate-500 dark:text-slate-400 ${isListening ? 'bg-red-500/20 text-red-500' : 'hover:bg-slate-200 dark:hover:bg-slate-700/60'}`}>
                         <MicrophoneIcon className="w-5 h-5" />
                     </button>
                     <textarea
@@ -137,11 +137,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                         rows={1}
                         className="flex-1 resize-none p-3 px-4 text-sm rounded-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#D4A22E] focus:border-transparent outline-none"
                     />
-                     <label className="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-pointer transition-colors">
+                     <label className="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700/60 text-slate-500 dark:text-slate-400 cursor-pointer transition-colors">
                         <ArrowUpTrayIcon className="w-5 h-5" />
                         <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                     </label>
-                    <button onClick={() => setShowCamera(true)} className="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+                    <button onClick={() => setShowCamera(true)} className="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700/60 text-slate-500 dark:text-slate-400 transition-colors">
                         <CameraIcon className="w-5 h-5" />
                     </button>
                     <button onClick={() => handleSendMessage()} disabled={isLoading || !input.trim()} className="p-3 rounded-full bg-[#D4A22E] text-white disabled:bg-slate-400 dark:disabled:bg-slate-600 transition-colors">

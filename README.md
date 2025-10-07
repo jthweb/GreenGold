@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/logo.svg" alt="GreenGold Logo" width="150">
+  <img src="./logo.png" alt="GreenGold Logo" width="150">
 </p>
 <h1 align="center">GreenGold - Your AI Farming Assistant</h1>
 
